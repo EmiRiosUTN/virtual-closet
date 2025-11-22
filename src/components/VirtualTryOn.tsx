@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, User, AlertCircle, Heart } from 'lucide-react';
+import { Sparkles, User, AlertCircle, Heart, Maximize2, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingItem, UserPhoto, Outfit } from '../types';
 import { storageService } from '../services/storage';
 import { createNanoBananaService } from '../services/nanoBanana';
@@ -19,6 +20,7 @@ export const VirtualTryOn = () => {
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     loadUserPhotos();
@@ -325,13 +327,54 @@ export const VirtualTryOn = () => {
       {resultImage && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h4 className="text-lg font-light text-gray-900 mb-4">Resultado</h4>
-          <img
-            src={resultImage}
-            alt="Virtual try-on result"
-            className="w-full rounded-xl"
-          />
+          <div className="relative max-w-md mx-auto group">
+            <img
+              src={resultImage}
+              alt="Virtual try-on result"
+              className="w-full rounded-xl cursor-pointer transition-transform hover:scale-[1.02]"
+              onClick={() => setShowImageModal(true)}
+            />
+            <button
+              onClick={() => setShowImageModal(true)}
+              className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+            >
+              <Maximize2 className="w-5 h-5 text-gray-700" />
+            </button>
+          </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {showImageModal && resultImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowImageModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="relative max-w-4xl w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowImageModal(false)}
+                className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <img
+                src={resultImage}
+                alt="Virtual try-on result full size"
+                className="w-full rounded-2xl shadow-2xl"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
