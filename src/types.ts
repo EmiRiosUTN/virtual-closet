@@ -1,4 +1,15 @@
-export type ClothingCategory = 'tops' | 'bottoms' | 'dresses' | 'shoes' | 'accessories' | 'outerwear' | 'tshirts' | 'sweaters';
+export type ClothingCategory =
+  | 'Blusas'
+  | 'Remeras'
+  | 'Sweaters'
+  | 'Pantalones'
+  | 'Polleras'
+  | 'Shorts'
+  | 'Vestidos'
+  | 'Chalecos'
+  | 'Camperas'
+  | 'Accesorios'
+  | 'Zapatos';
 
 export interface ClothingItem {
   id: string;

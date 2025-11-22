@@ -9,18 +9,21 @@ interface ClothingUploadProps {
 }
 
 const categories: { value: ClothingCategory; label: string }[] = [
-  { value: 'tops', label: 'Blusas y Camisas' },
-  { value: 'tshirts', label: 'Remeras' },
-  { value: 'sweaters', label: 'Sweaters y Buzos' },
-  { value: 'bottoms', label: 'Pantalones y Faldas' },
-  { value: 'dresses', label: 'Vestidos' },
-  { value: 'shoes', label: 'Zapatos' },
-  { value: 'accessories', label: 'Accesorios' },
-  { value: 'outerwear', label: 'Abrigos y Chaquetas' },
+  { value: 'Blusas', label: 'Blusas' },
+  { value: 'Remeras', label: 'Remeras' },
+  { value: 'Sweaters', label: 'Sweaters' },
+  { value: 'Pantalones', label: 'Pantalones' },
+  { value: 'Polleras', label: 'Polleras' },
+  { value: 'Shorts', label: 'Shorts' },
+  { value: 'Vestidos', label: 'Vestidos' },
+  { value: 'Chalecos', label: 'Chalecos' },
+  { value: 'Camperas', label: 'Camperas' },
+  { value: 'Accesorios', label: 'Accesorios' },
+  { value: 'Zapatos', label: 'Zapatos' },
 ];
 
 export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<ClothingCategory>('tops');
+  const [selectedCategory, setSelectedCategory] = useState<ClothingCategory>('Remeras');
   const [itemName, setItemName] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

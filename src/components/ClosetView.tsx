@@ -11,14 +11,17 @@ interface ClosetViewProps {
 
 const categories: { value: ClothingCategory | 'all'; label: string }[] = [
   { value: 'all', label: 'Todas' },
-  { value: 'tops', label: 'Blusas' },
-  { value: 'tshirts', label: 'Remeras' },
-  { value: 'sweaters', label: 'Sweaters' },
-  { value: 'bottoms', label: 'Pantalones' },
-  { value: 'dresses', label: 'Vestidos' },
-  { value: 'shoes', label: 'Zapatos' },
-  { value: 'accessories', label: 'Accesorios' },
-  { value: 'outerwear', label: 'Abrigos' },
+  { value: 'Blusas', label: 'Blusas' },
+  { value: 'Remeras', label: 'Remeras' },
+  { value: 'Sweaters', label: 'Sweaters' },
+  { value: 'Pantalones', label: 'Pantalones' },
+  { value: 'Polleras', label: 'Polleras' },
+  { value: 'Shorts', label: 'Shorts' },
+  { value: 'Vestidos', label: 'Vestidos' },
+  { value: 'Chalecos', label: 'Chalecos' },
+  { value: 'Camperas', label: 'Camperas' },
+  { value: 'Accesorios', label: 'Accesorios' },
+  { value: 'Zapatos', label: 'Zapatos' },
 ];
 
 export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps) => {
