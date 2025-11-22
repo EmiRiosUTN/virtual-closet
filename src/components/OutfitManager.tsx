@@ -5,6 +5,8 @@ import { Outfit, ClothingItem } from '../types';
 import { storageService } from '../services/storage';
 import { ClosetView } from './ClosetView';
 import { OutfitModal } from './OutfitModal';
+import { useToast } from '../hooks/useToast';
+import { ToastContainer } from './Toast';
 
 export const OutfitManager = () => {
   const [outfits, setOutfits] = useState<Outfit[]>([]);
@@ -15,6 +17,7 @@ export const OutfitManager = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [nameError, setNameError] = useState('');
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
+  const { warning, toasts, removeToast } = useToast();
 
   useEffect(() => {
     loadOutfits();
@@ -43,6 +46,15 @@ export const OutfitManager = () => {
       if (exists) {
         return prev.filter((i) => i.id !== item.id);
       }
+
+      if (item.category !== 'Accesorios') {
+        const categoryExists = prev.find((i) => i.category === item.category);
+        if (categoryExists) {
+          warning(`Solo puedes seleccionar una prenda de ${item.category}. Quita la prenda actual antes de agregar otra.`);
+          return prev;
+        }
+      }
+
       return [...prev, item];
     });
   };
@@ -104,6 +116,8 @@ export const OutfitManager = () => {
   };
 
   return (
+    <>
+    <ToastContainer toasts={toasts} onClose={removeToast} />
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -374,5 +388,6 @@ export const OutfitManager = () => {
         )}
       </AnimatePresence>
     </motion.div>
+    </>
   );
 };

@@ -5,6 +5,8 @@ import { ClothingItem, UserPhoto, Outfit } from '../types';
 import { storageService } from '../services/storage';
 import { createNanoBananaService } from '../services/nanoBanana';
 import { ClosetView } from './ClosetView';
+import { useToast } from '../hooks/useToast';
+import { ToastContainer } from './Toast';
 
 type SelectionMode = 'individual' | 'outfit';
 
@@ -21,6 +23,7 @@ export const VirtualTryOn = () => {
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const [showImageModal, setShowImageModal] = useState(false);
+  const { warning, toasts, removeToast } = useToast();
 
   useEffect(() => {
     loadUserPhotos();
@@ -64,6 +67,15 @@ export const VirtualTryOn = () => {
       if (exists) {
         return prev.filter((i) => i.id !== item.id);
       }
+
+      if (item.category !== 'Accesorios') {
+        const categoryExists = prev.find((i) => i.category === item.category);
+        if (categoryExists) {
+          warning(`Solo puedes seleccionar una prenda de ${item.category}. Quita la prenda actual antes de agregar otra.`);
+          return prev;
+        }
+      }
+
       return [...prev, item];
     });
   };
@@ -111,6 +123,7 @@ export const VirtualTryOn = () => {
 
   return (
     <>
+    <ToastContainer toasts={toasts} onClose={removeToast} />
     <div className="space-y-8">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div className="flex items-center gap-3 mb-6">
