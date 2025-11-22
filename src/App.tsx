@@ -148,7 +148,7 @@ function App() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {activeTab === 'closet' && <ClosetView key={refreshKey} />}
+            {activeTab === 'closet' && <ClosetView key={refreshKey} onAddItemClick={() => setActiveTab('upload')} />}
             {activeTab === 'upload' && (
               <ClothingUpload onUploadComplete={handleUploadComplete} />
             )}

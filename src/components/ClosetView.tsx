@@ -7,6 +7,7 @@ import { storageService } from '../services/storage';
 interface ClosetViewProps {
   onItemSelect?: (item: ClothingItem) => void;
   selectedItems?: string[];
+  onAddItemClick?: () => void;
 }
 
 const categories: { value: ClothingCategory | 'all'; label: string }[] = [
@@ -24,7 +25,7 @@ const categories: { value: ClothingCategory | 'all'; label: string }[] = [
   { value: 'Zapatos', label: 'Zapatos' },
 ];
 
-export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps) => {
+export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }: ClosetViewProps) => {
   const [items, setItems] = useState<ClothingItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ClothingCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -191,8 +192,9 @@ export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps
                   ? 'Intenta con otra búsqueda'
                   : '¡Comienza agregando tus primeras prendas!'}
               </p>
-              {!searchQuery && (
+              {!searchQuery && onAddItemClick && (
                 <motion.button
+                  onClick={onAddItemClick}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-[#171936] text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
