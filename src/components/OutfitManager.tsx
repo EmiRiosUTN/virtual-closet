@@ -6,7 +6,6 @@ import { storageService } from '../services/storage';
 import { ClosetView } from './ClosetView';
 import { OutfitModal } from './OutfitModal';
 import { useToast } from '../hooks/useToast';
-import { ToastContainer } from './Toast';
 
 export const OutfitManager = () => {
   const [outfits, setOutfits] = useState<Outfit[]>([]);
@@ -17,7 +16,7 @@ export const OutfitManager = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [nameError, setNameError] = useState('');
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
-  const { warning, toasts, removeToast } = useToast();
+  const { warning } = useToast();
 
   useEffect(() => {
     loadOutfits();
@@ -116,8 +115,6 @@ export const OutfitManager = () => {
   };
 
   return (
-    <>
-    <ToastContainer toasts={toasts} onClose={removeToast} />
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -388,6 +385,5 @@ export const OutfitManager = () => {
         )}
       </AnimatePresence>
     </motion.div>
-    </>
   );
 };

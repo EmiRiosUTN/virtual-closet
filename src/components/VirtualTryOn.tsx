@@ -6,7 +6,6 @@ import { storageService } from '../services/storage';
 import { createNanoBananaService } from '../services/nanoBanana';
 import { ClosetView } from './ClosetView';
 import { useToast } from '../hooks/useToast';
-import { ToastContainer } from './Toast';
 
 type SelectionMode = 'individual' | 'outfit';
 
@@ -23,7 +22,7 @@ export const VirtualTryOn = () => {
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const [showImageModal, setShowImageModal] = useState(false);
-  const { warning, toasts, removeToast } = useToast();
+  const { warning } = useToast();
 
   useEffect(() => {
     loadUserPhotos();
@@ -122,8 +121,6 @@ export const VirtualTryOn = () => {
   };
 
   return (
-    <>
-    <ToastContainer toasts={toasts} onClose={removeToast} />
     <div className="space-y-8">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div className="flex items-center gap-3 mb-6">
@@ -357,10 +354,9 @@ export const VirtualTryOn = () => {
           </div>
         </div>
       )}
-    </div>
 
-    <AnimatePresence>
-      {showImageModal && resultImage && (
+      <AnimatePresence>
+        {showImageModal && resultImage && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -389,8 +385,8 @@ export const VirtualTryOn = () => {
             />
           </motion.div>
         </motion.div>
-      )}
-    </AnimatePresence>
-    </>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };

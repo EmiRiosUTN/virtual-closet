@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Trash2, Shirt, Search, Sparkles, Check } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Trash2, Shirt, Search, Sparkles, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ClothingItem, ClothingCategory } from '../types';
 import { storageService } from '../services/storage';
@@ -29,6 +29,9 @@ export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps
   const [selectedCategory, setSelectedCategory] = useState<ClothingCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadItems();
@@ -43,6 +46,40 @@ export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps
     storageService.deleteClothingItem(id);
     loadItems();
     setDeleteConfirm(null);
+  };
+
+  const checkScrollButtons = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setShowLeftArrow(container.scrollLeft > 0);
+      setShowRightArrow(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+      );
+    }
+  };
+
+  useEffect(() => {
+    checkScrollButtons();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollButtons);
+      window.addEventListener('resize', checkScrollButtons);
+      return () => {
+        container.removeEventListener('scroll', checkScrollButtons);
+        window.removeEventListener('resize', checkScrollButtons);
+      };
+    }
+  }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = 200;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
   };
 
   const filteredItems = useMemo(() => {
@@ -94,7 +131,24 @@ export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps
         </div>
 
         <div className="p-6 sm:p-8">
-          <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide pb-2">
+          <div className="relative mb-6">
+            {showLeftArrow && (
+              <button
+                onClick={() => scroll('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-neutral-100 transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5 text-neutral-700" />
+              </button>
+            )}
+            {showRightArrow && (
+              <button
+                onClick={() => scroll('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-neutral-100 transition-colors"
+              >
+                <ChevronRight className="w-5 h-5 text-neutral-700" />
+              </button>
+            )}
+          <div ref={scrollContainerRef} className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
             {categories.map((cat) => {
               const isSelected = selectedCategory === cat.value;
               return (
@@ -113,6 +167,7 @@ export const ClosetView = ({ onItemSelect, selectedItems = [] }: ClosetViewProps
                 </motion.button>
               );
             })}
+          </div>
           </div>
 
           {filteredItems.length === 0 ? (
