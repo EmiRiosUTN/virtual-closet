@@ -1,0 +1,337 @@
+import { useState, useEffect } from 'react';
+import { Sparkles, User, AlertCircle, Heart } from 'lucide-react';
+import { ClothingItem, UserPhoto, Outfit } from '../types';
+import { storageService } from '../services/storage';
+import { createNanoBananaService } from '../services/nanoBanana';
+import { ClosetView } from './ClosetView';
+
+type SelectionMode = 'individual' | 'outfit';
+
+export const VirtualTryOn = () => {
+  const [userPhotos, setUserPhotos] = useState<UserPhoto[]>([]);
+  const [selectedUserPhoto, setSelectedUserPhoto] = useState<UserPhoto | null>(null);
+  const [selectedClothingItems, setSelectedClothingItems] = useState<ClothingItem[]>([]);
+  const [apiKey, setApiKey] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [resultImage, setResultImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>('individual');
+  const [outfits, setOutfits] = useState<Outfit[]>([]);
+  const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
+  const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
+
+  useEffect(() => {
+    loadUserPhotos();
+    loadOutfits();
+    loadClothingItems();
+  }, []);
+
+  const loadUserPhotos = () => {
+    const photos = storageService.getUserPhotos();
+    setUserPhotos(photos);
+    if (photos.length > 0 && !selectedUserPhoto) {
+      setSelectedUserPhoto(photos[0]);
+    }
+  };
+
+  const loadOutfits = () => {
+    const savedOutfits = storageService.getOutfits();
+    setOutfits(savedOutfits);
+  };
+
+  const loadClothingItems = () => {
+    const items = storageService.getClothingItems();
+    setAllClothingItems(items);
+  };
+
+  const getItemsForOutfit = (outfit: Outfit): ClothingItem[] => {
+    return outfit.items
+      .map((itemId) => allClothingItems.find((item) => item.id === itemId))
+      .filter((item): item is ClothingItem => item !== undefined);
+  };
+
+  const handleOutfitSelect = (outfit: Outfit) => {
+    setSelectedOutfit(outfit);
+    const items = getItemsForOutfit(outfit);
+    setSelectedClothingItems(items);
+  };
+
+  const handleItemSelect = (item: ClothingItem) => {
+    setSelectedClothingItems((prev) => {
+      const exists = prev.find((i) => i.id === item.id);
+      if (exists) {
+        return prev.filter((i) => i.id !== item.id);
+      }
+      return [...prev, item];
+    });
+  };
+
+  const handleTryOn = async () => {
+    if (!selectedUserPhoto || selectedClothingItems.length === 0 || !apiKey.trim()) {
+      setError('Por favor selecciona una foto tuya, al menos una prenda y configura tu API key');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+    setResultImage(null);
+
+    try {
+      const service = createNanoBananaService(apiKey);
+      const clothingUrls = selectedClothingItems.map((item) => item.imageUrl);
+
+      const resultUrl = await service.virtualTryOn(
+        selectedUserPhoto.imageUrl,
+        clothingUrls
+      );
+
+      setResultImage(resultUrl);
+
+      const result = {
+        id: crypto.randomUUID(),
+        imageUrl: resultUrl,
+        userPhotoId: selectedUserPhoto.id,
+        clothingItemIds: selectedClothingItems.map((item) => item.id),
+        createdAt: Date.now(),
+      };
+
+      storageService.saveTryOnResult(result);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Error al procesar la imagen. Verifica tu API key y vuelve a intentar.'
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <Sparkles className="w-6 h-6 text-gray-400" />
+          <h3 className="text-xl font-light text-gray-900">Prueba Virtual</h3>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-light text-gray-700 mb-2">
+              API Key de Google AI (Gemini)
+            </label>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Ingresa tu API key"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all font-light"
+            />
+            <p className="text-xs text-gray-500 font-light mt-2">
+              Obtén tu API key gratis en{' '}
+              <a
+                href="https://aistudio.google.com/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 underline"
+              >
+                Google AI Studio
+              </a>
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-light text-gray-700 mb-3">
+              Selecciona tu foto
+            </label>
+            {userPhotos.length === 0 ? (
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+                <User className="w-5 h-5 text-gray-400" />
+                <p className="text-sm text-gray-500 font-light">
+                  Primero debes subir fotos tuyas en la sección "Mis Fotos"
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 gap-3">
+                {userPhotos.map((photo) => (
+                  <button
+                    key={photo.id}
+                    onClick={() => setSelectedUserPhoto(photo)}
+                    className={`aspect-square rounded-xl overflow-hidden transition-all ${
+                      selectedUserPhoto?.id === photo.id
+                        ? 'ring-2 ring-gray-900'
+                        : 'opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={photo.imageUrl}
+                      alt={photo.angle}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="flex gap-3 mb-4">
+              <button
+                onClick={() => {
+                  setSelectionMode('individual');
+                  setSelectedOutfit(null);
+                }}
+                className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${
+                  selectionMode === 'individual'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" />
+                Prendas Individuales
+              </button>
+              <button
+                onClick={() => {
+                  setSelectionMode('outfit');
+                  setSelectedClothingItems([]);
+                }}
+                className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${
+                  selectionMode === 'outfit'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Heart className="w-4 h-4" />
+                Mis Outfits
+              </button>
+            </div>
+
+            {selectionMode === 'individual' ? (
+              <div>
+                <label className="block text-sm font-light text-gray-700 mb-3">
+                  Selecciona las prendas ({selectedClothingItems.length} seleccionadas)
+                </label>
+                <ClosetView
+                  onItemSelect={handleItemSelect}
+                  selectedItems={selectedClothingItems.map((item) => item.id)}
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-light text-gray-700 mb-3">
+                  Selecciona un outfit
+                </label>
+                {outfits.length === 0 ? (
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+                    <Heart className="w-5 h-5 text-gray-400" />
+                    <p className="text-sm text-gray-500 font-light">
+                      No tienes outfits guardados. Crea uno en la sección "Mis Outfits"
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {outfits.map((outfit) => {
+                      const items = getItemsForOutfit(outfit);
+                      const isSelected = selectedOutfit?.id === outfit.id;
+                      return (
+                        <button
+                          key={outfit.id}
+                          onClick={() => handleOutfitSelect(outfit)}
+                          className={`relative text-left rounded-xl overflow-hidden transition-all hover:shadow-lg ${
+                            isSelected ? 'ring-2 ring-gray-900' : ''
+                          }`}
+                        >
+                          <div className="aspect-square bg-gray-50 p-2 grid grid-cols-2 gap-2">
+                            {items.slice(0, 4).map((item, index) => (
+                              <div
+                                key={item.id}
+                                className={`rounded-lg overflow-hidden ${
+                                  items.length === 1 ? 'col-span-2 row-span-2' : ''
+                                } ${
+                                  items.length === 3 && index === 0 ? 'col-span-2' : ''
+                                }`}
+                              >
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ))}
+                            {items.length > 4 && (
+                              <div className="bg-gray-900 bg-opacity-80 flex items-center justify-center rounded-lg">
+                                <span className="text-white font-light text-xs">
+                                  +{items.length - 4}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-3 bg-white">
+                            <p className="text-sm font-light text-gray-900 truncate">
+                              {outfit.name}
+                            </p>
+                            <p className="text-xs text-gray-500 font-light">
+                              {items.length} {items.length === 1 ? 'prenda' : 'prendas'}
+                            </p>
+                          </div>
+                          {isSelected && (
+                            <div className="absolute inset-0 bg-gray-900 bg-opacity-10 flex items-center justify-center">
+                              <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-medium">✓</span>
+                              </div>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {error && (
+            <div className="flex items-start gap-3 p-4 bg-red-50 rounded-xl">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-600 font-light">{error}</p>
+            </div>
+          )}
+
+          <button
+            onClick={handleTryOn}
+            disabled={
+              isProcessing ||
+              !selectedUserPhoto ||
+              selectedClothingItems.length === 0 ||
+              !apiKey.trim()
+            }
+            className="w-full bg-gray-900 text-white py-4 rounded-xl font-light hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isProcessing ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Procesando...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                Probar Outfit
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {resultImage && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <h4 className="text-lg font-light text-gray-900 mb-4">Resultado</h4>
+          <img
+            src={resultImage}
+            alt="Virtual try-on result"
+            className="w-full rounded-xl"
+          />
+        </div>
+      )}
+    </div>
+  );
+};
