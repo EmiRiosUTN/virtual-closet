@@ -357,7 +357,7 @@ export const VirtualTryOn = () => {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="relative max-w-4xl w-full"
+              className="relative max-w-lg w-full"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -369,7 +369,7 @@ export const VirtualTryOn = () => {
               <img
                 src={resultImage}
                 alt="Virtual try-on result full size"
-                className="w-full rounded-2xl shadow-2xl"
+                className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
               />
             </motion.div>
           </motion.div>
