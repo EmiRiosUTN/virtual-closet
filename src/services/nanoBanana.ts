@@ -1,9 +1,11 @@
 export class NanoBananaService {
   private apiKey: string;
-  private baseUrl = 'https://nanobanana.dev/api/predict/pro';
+  private baseUrl: string;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    this.baseUrl = `${supabaseUrl}/functions/v1/nano-banana-proxy`;
   }
 
   async virtualTryOn(
@@ -16,32 +18,33 @@ export class NanoBananaService {
     const clothingImages = clothingPhotosBase64.map(photo => this.extractBase64Data(photo));
 
     const requestBody = {
-      person_image: this.extractBase64Data(userPhotoBase64),
-      clothing_images: clothingImages,
+      personImage: this.extractBase64Data(userPhotoBase64),
+      clothingImages: clothingImages,
       prompt: prompt,
+      apiKey: this.apiKey,
     };
 
     const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Nano Banana API error: ${response.statusText} - ${errorText}`);
+      throw new Error(`API error: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
 
     if (!data.output_image) {
-      throw new Error('No image returned from Nano Banana API');
+      throw new Error('No image returned from API');
     }
 
-    return `data:image/jpeg;base64,${data.output_image}`;
+    const mimeType = data.mime_type || 'image/jpeg';
+    return `data:${mimeType};base64,${data.output_image}`;
   }
 
   private extractBase64Data(base64String: string): string {

@@ -160,7 +160,7 @@ function App() {
 
         <footer className="mt-16 text-center">
           <p className="text-sm text-neutral-400">
-            Powered by Nano Banana AI
+            Powered by Google Gemini 2.0 Flash
           </p>
         </footer>
       </div>
