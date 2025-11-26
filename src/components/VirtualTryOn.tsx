@@ -141,14 +141,14 @@ export const VirtualTryOn = () => {
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all font-light"
             />
             <p className="text-xs text-gray-500 font-light mt-2">
-              Obtén tu API key gratis en{' '}
+              Obtén tu API key en{' '}
               <a
-                href="https://aistudio.google.com/apikey"
+                href="https://nanobanana.dev"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 underline"
               >
-                Google AI Studio
+                Nano Banana
               </a>
             </p>
           </div>

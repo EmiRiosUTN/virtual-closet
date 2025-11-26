@@ -1,28 +1,6 @@
-interface GeminiPart {
-  text?: string;
-  inlineData?: {
-    mimeType: string;
-    data: string;
-  };
-}
-
-interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text?: string;
-        inlineData?: {
-          mimeType: string;
-          data: string;
-        };
-      }>;
-    };
-  }>;
-}
-
 export class NanoBananaService {
   private apiKey: string;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent';
+  private baseUrl = 'https://nanobanana.dev/api/predict/pro';
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -35,40 +13,19 @@ export class NanoBananaService {
   ): Promise<string> {
     const prompt = customPrompt || this.generateTryOnPrompt(clothingPhotosBase64.length);
 
-    const parts: GeminiPart[] = [
-      { text: prompt },
-      {
-        inlineData: {
-          mimeType: this.getMimeType(userPhotoBase64),
-          data: this.extractBase64Data(userPhotoBase64),
-        },
-      },
-    ];
-
-    clothingPhotosBase64.forEach((photo) => {
-      parts.push({
-        inlineData: {
-          mimeType: this.getMimeType(photo),
-          data: this.extractBase64Data(photo),
-        },
-      });
-    });
+    const clothingImages = clothingPhotosBase64.map(photo => this.extractBase64Data(photo));
 
     const requestBody = {
-      contents: [
-        {
-          parts,
-        },
-      ],
-      generationConfig: {
-        responseModalities: ['image'],
-      },
+      person_image: this.extractBase64Data(userPhotoBase64),
+      clothing_images: clothingImages,
+      prompt: prompt,
     };
 
-    const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+    const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify(requestBody),
     });
@@ -78,26 +35,13 @@ export class NanoBananaService {
       throw new Error(`Nano Banana API error: ${response.statusText} - ${errorText}`);
     }
 
-    const data: GeminiResponse = await response.json();
+    const data = await response.json();
 
-    if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response from Nano Banana API');
-    }
-
-    const imagePart = data.candidates[0].content.parts.find(
-      (part) => part.inlineData
-    );
-
-    if (!imagePart || !imagePart.inlineData) {
+    if (!data.output_image) {
       throw new Error('No image returned from Nano Banana API');
     }
 
-    return `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-  }
-
-  private getMimeType(base64String: string): string {
-    const match = base64String.match(/^data:([^;]+);base64,/);
-    return match ? match[1] : 'image/jpeg';
+    return `data:image/jpeg;base64,${data.output_image}`;
   }
 
   private extractBase64Data(base64String: string): string {
@@ -106,9 +50,9 @@ export class NanoBananaService {
 
   private generateTryOnPrompt(itemCount: number): string {
     if (itemCount === 1) {
-      return 'Make the person in the first image wear the clothing item shown in the second image. Keep their face, body proportions, and pose exactly the same. Only change the clothing to match the second image. Make it look natural and realistic.';
+      return 'Show the person wearing this clothing item. Maintain realistic proportions and natural appearance.';
     }
-    return 'Make the person in the first image wear all the clothing items shown in the additional images, creating a complete outfit. Keep their face, body proportions, and pose exactly the same. Only change the clothing. Make it look natural and realistic.';
+    return 'Show the person wearing all these clothing items together as a complete outfit. Maintain realistic proportions and natural appearance.';
   }
 }
 
