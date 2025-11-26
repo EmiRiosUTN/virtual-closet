@@ -106,7 +106,7 @@ export class NanoBananaService {
 
   private generateTryOnPrompt(itemCount: number): string {
     if (itemCount === 1) {
-      return "Render the provided clothing item onto the person's image, ensuring a seamless and realistic integration. The resulting image must depict the person wearing the garment with highly accurate, anatomically correct proportions and natural draping. Maintain the original person's pose, facial features, and overall lighting conditions. Minimize any unnecessary modifications to the original photograph; only the integration of the garment should be visible";
+      return 'Make the person in the first image wear the clothing item shown in the second image. Keep their face, body proportions, and pose exactly the same. Only change the clothing to match the second image. Make it look natural and realistic.';
     }
     return 'Make the person in the first image wear all the clothing items shown in the additional images, creating a complete outfit. Keep their face, body proportions, and pose exactly the same. Only change the clothing. Make it look natural and realistic.';
   }
