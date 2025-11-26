@@ -150,7 +150,6 @@ export const VirtualTryOn = () => {
               >
                 Google AI Studio
               </a>
-              {' '}(usa Gemini 2.0 Flash con generación de imágenes)
             </p>
           </div>
 
