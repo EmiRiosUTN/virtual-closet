@@ -53,9 +53,9 @@ export class NanoBananaService {
 
   private generateTryOnPrompt(itemCount: number): string {
     if (itemCount === 1) {
-      return 'Show the person wearing this clothing item. Maintain realistic proportions and natural appearance.';
+      return "Render the provided clothing item onto the person's image, ensuring a seamless and realistic integration. The resulting image must depict the person wearing the garment with highly accurate, anatomically correct proportions and natural draping. Maintain the original person's pose, facial features, and overall lighting conditions. Minimize any unnecessary modifications to the original photograph; only the integration of the garment should be visible";
     }
-    return 'Show the person wearing all these clothing items together as a complete outfit. Maintain realistic proportions and natural appearance.';
+    return "Render the provided clothing item onto the person's image, ensuring a seamless and realistic integration. The resulting image must depict the person wearing the garment with highly accurate, anatomically correct proportions and natural draping. Maintain the original person's pose, facial features, and overall lighting conditions. Minimize any unnecessary modifications to the original photograph; only the integration of the garment should be visible";
   }
 }
 
