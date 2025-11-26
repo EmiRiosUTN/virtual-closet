@@ -22,8 +22,8 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
     loadClothingItems();
   }, []);
 
-  const loadClothingItems = () => {
-    const items = storageService.getClothingItems();
+  const loadClothingItems = async () => {
+    const items = await storageService.getClothingItems();
     setAllClothingItems(items);
 
     const outfitItems = outfit.items
@@ -32,13 +32,13 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
     setSelectedItems(outfitItems);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const updatedOutfit: Outfit = {
       ...outfit,
       name: outfitName.trim(),
       items: selectedItems.map((item) => item.id),
     };
-    storageService.saveOutfit(updatedOutfit);
+    await storageService.saveOutfit(updatedOutfit);
     setIsEditing(false);
     onUpdate();
   };

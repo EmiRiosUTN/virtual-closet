@@ -105,7 +105,7 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
         createdAt: Date.now(),
       };
 
-      storageService.saveClothingItem(newItem);
+      await storageService.saveClothingItem(newItem);
 
       setItemName('');
       setPreviewUrl(null);

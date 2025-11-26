@@ -30,21 +30,21 @@ export const VirtualTryOn = () => {
     loadClothingItems();
   }, []);
 
-  const loadUserPhotos = () => {
-    const photos = storageService.getUserPhotos();
+  const loadUserPhotos = async () => {
+    const photos = await storageService.getUserPhotos();
     setUserPhotos(photos);
     if (photos.length > 0 && !selectedUserPhoto) {
       setSelectedUserPhoto(photos[0]);
     }
   };
 
-  const loadOutfits = () => {
-    const savedOutfits = storageService.getOutfits();
+  const loadOutfits = async () => {
+    const savedOutfits = await storageService.getOutfits();
     setOutfits(savedOutfits);
   };
 
-  const loadClothingItems = () => {
-    const items = storageService.getClothingItems();
+  const loadClothingItems = async () => {
+    const items = await storageService.getClothingItems();
     setAllClothingItems(items);
   };
 
@@ -108,7 +108,7 @@ export const VirtualTryOn = () => {
         createdAt: Date.now(),
       };
 
-      storageService.saveTryOnResult(result);
+      await storageService.saveTryOnResult(result);
     } catch (err) {
       setError(
         err instanceof Error

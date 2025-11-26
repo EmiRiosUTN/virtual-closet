@@ -23,13 +23,13 @@ export const OutfitManager = () => {
     loadClothingItems();
   }, []);
 
-  const loadOutfits = () => {
-    const savedOutfits = storageService.getOutfits();
+  const loadOutfits = async () => {
+    const savedOutfits = await storageService.getOutfits();
     setOutfits(savedOutfits);
   };
 
-  const loadClothingItems = () => {
-    const items = storageService.getClothingItems();
+  const loadClothingItems = async () => {
+    const items = await storageService.getClothingItems();
     setAllClothingItems(items);
   };
 
@@ -71,7 +71,7 @@ export const OutfitManager = () => {
     return true;
   };
 
-  const handleSaveOutfit = () => {
+  const handleSaveOutfit = async () => {
     if (!validateName()) return;
 
     if (selectedItems.length === 0) {
@@ -86,24 +86,23 @@ export const OutfitManager = () => {
       createdAt: Date.now(),
     };
 
-    storageService.saveOutfit(newOutfit);
+    await storageService.saveOutfit(newOutfit);
     setOutfitName('');
     setSelectedItems([]);
     setIsCreating(false);
     setNameError('');
-    loadOutfits();
+    await loadOutfits();
   };
 
-  const deleteOutfit = (id: string) => {
-    storageService.deleteOutfit(id);
-    loadOutfits();
+  const deleteOutfit = async (id: string) => {
+    await storageService.deleteOutfit(id);
+    await loadOutfits();
     setDeleteConfirm(null);
   };
 
   const getItemsForOutfit = (outfit: Outfit): ClothingItem[] => {
-    const currentItems = storageService.getClothingItems();
     return outfit.items
-      .map((itemId) => currentItems.find((item) => item.id === itemId))
+      .map((itemId) => allClothingItems.find((item) => item.id === itemId))
       .filter((item): item is ClothingItem => item !== undefined);
   };
 

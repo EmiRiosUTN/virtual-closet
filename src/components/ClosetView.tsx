@@ -38,14 +38,14 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
     loadItems();
   }, []);
 
-  const loadItems = () => {
-    const allItems = storageService.getClothingItems();
+  const loadItems = async () => {
+    const allItems = await storageService.getClothingItems();
     setItems(allItems);
   };
 
-  const deleteItem = (id: string) => {
-    storageService.deleteClothingItem(id);
-    loadItems();
+  const deleteItem = async (id: string) => {
+    await storageService.deleteClothingItem(id);
+    await loadItems();
     setDeleteConfirm(null);
   };
 

@@ -21,8 +21,8 @@ export const UserPhotosUpload = () => {
     loadPhotos();
   }, []);
 
-  const loadPhotos = () => {
-    const photos = storageService.getUserPhotos();
+  const loadPhotos = async () => {
+    const photos = await storageService.getUserPhotos();
     setUserPhotos(photos);
   };
 
@@ -50,19 +50,19 @@ export const UserPhotosUpload = () => {
         createdAt: Date.now(),
       };
 
-      storageService.saveUserPhoto(newPhoto);
+      await storageService.saveUserPhoto(newPhoto);
 
       setPreviewUrl(null);
       setSelectedFile(null);
-      loadPhotos();
+      await loadPhotos();
     } finally {
       setIsUploading(false);
     }
   };
 
-  const deletePhoto = (id: string) => {
-    storageService.deleteUserPhoto(id);
-    loadPhotos();
+  const deletePhoto = async (id: string) => {
+    await storageService.deleteUserPhoto(id);
+    await loadPhotos();
   };
 
   const getPhotoForAngle = (angle: UserPhoto['angle']) => {
