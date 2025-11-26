@@ -199,10 +199,10 @@ export const storageService = {
 
     return data.map(result => ({
       id: result.id,
-      resultImage: result.result_image_url,
+      imageUrl: result.result_image_url,
       userPhotoId: result.user_photo_id,
       clothingItemIds: result.clothing_item_ids || [],
-      timestamp: new Date(result.created_at).getTime(),
+      createdAt: new Date(result.created_at).getTime(),
     }));
   },
 
@@ -211,7 +211,7 @@ export const storageService = {
       .from('try_on_results')
       .insert({
         id: result.id,
-        result_image_url: result.resultImage,
+        result_image_url: result.imageUrl,
         user_photo_id: result.userPhotoId,
         clothing_item_ids: result.clothingItemIds,
       });
