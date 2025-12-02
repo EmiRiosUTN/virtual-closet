@@ -13,7 +13,6 @@ export const VirtualTryOn = () => {
   const [userPhotos, setUserPhotos] = useState<UserPhoto[]>([]);
   const [selectedUserPhoto, setSelectedUserPhoto] = useState<UserPhoto | null>(null);
   const [selectedClothingItems, setSelectedClothingItems] = useState<ClothingItem[]>([]);
-  const [apiKey, setApiKey] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,8 +79,8 @@ export const VirtualTryOn = () => {
   };
 
   const handleTryOn = async () => {
-    if (!selectedUserPhoto || selectedClothingItems.length === 0 || !apiKey.trim()) {
-      setError('Por favor selecciona una foto tuya, al menos una prenda y configura tu API key');
+    if (!selectedUserPhoto || selectedClothingItems.length === 0) {
+      setError('Por favor selecciona una foto tuya y al menos una prenda');
       return;
     }
 
@@ -90,6 +89,7 @@ export const VirtualTryOn = () => {
     setResultImage(null);
 
     try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const service = createNanoBananaService(apiKey);
       const clothingUrls = selectedClothingItems.map((item) => item.imageUrl);
 
@@ -129,30 +129,6 @@ export const VirtualTryOn = () => {
         </div>
 
         <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-light text-gray-700 mb-2">
-              API Key de Google AI (Gemini)
-            </label>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Ingresa tu API key"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all font-light"
-            />
-            <p className="text-xs text-gray-500 font-light mt-2">
-              Obtén tu API key gratis en{' '}
-              <a
-                href="https://aistudio.google.com/apikey"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-700 underline"
-              >
-                Google AI Studio
-              </a>
-            </p>
-          </div>
-
           <div>
             <label className="block text-sm font-light text-gray-700 mb-3">
               Selecciona tu foto
@@ -315,8 +291,7 @@ export const VirtualTryOn = () => {
             disabled={
               isProcessing ||
               !selectedUserPhoto ||
-              selectedClothingItems.length === 0 ||
-              !apiKey.trim()
+              selectedClothingItems.length === 0
             }
             className="w-full bg-gray-900 text-white py-4 rounded-xl font-light hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
