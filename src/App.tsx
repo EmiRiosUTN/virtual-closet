@@ -210,12 +210,6 @@ function AppContent() {
             {activeTab === 'outfits' && <OutfitManager />}
           </motion.main>
         </AnimatePresence>
-
-        <footer className="mt-16 text-center">
-          <p className="text-sm text-neutral-400">
-            Powered by Google Gemini AI
-          </p>
-        </footer>
       </div>
     </div>
   );
