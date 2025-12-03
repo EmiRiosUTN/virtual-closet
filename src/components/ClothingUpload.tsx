@@ -128,7 +128,7 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
       className="max-w-2xl lg:max-w-none mx-auto"
     >
       <div className="bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden">
-        <div className="bg-[#171936] px-8 py-6">
+        <div className="bg-zinc-900 px-8 py-6">
           <h2 className="text-2xl font-semibold text-white">Agregar Prenda</h2>
           <p className="text-white/80 text-sm mt-1">
             Completa los datos para agregar una nueva prenda a tu closet
