@@ -301,7 +301,7 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                               </div>
                             ))}
                             {items.length > 4 && (
-                              <div className="bg-gray-900 bg-opacity-80 flex items-center justify-center rounded-lg">
+                              <div className="bg-zinc-900 bg-opacity-80 flex items-center justify-center rounded-lg">
                                 <span className="text-white font-light text-xs">
                                   +{items.length - 4}
                                 </span>
@@ -317,8 +317,8 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                             </p>
                           </div>
                           {isSelected && (
-                            <div className="absolute inset-0 bg-gray-900 bg-opacity-10 flex items-center justify-center">
-                              <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
+                            <div className="absolute inset-0 bg-zinc-900 bg-opacity-10 flex items-center justify-center">
+                              <div className="w-8 h-8 bg-zinc-900 rounded-full flex items-center justify-center">
                                 <span className="text-white text-sm font-medium">✓</span>
                               </div>
                             </div>
@@ -346,7 +346,7 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
               !selectedUserPhoto ||
               selectedClothingItems.length === 0
             }
-            className="w-full bg-zinc-900 text-white py-4 rounded-xl font-light hover:bg-zinc-900 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-zinc-900 text-white py-4 rounded-xl font-light hover:bg-zinc-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isProcessing ? (
               <>
