@@ -35,21 +35,26 @@ export class NanoBananaService {
   ): Promise<string> {
     const prompt = customPrompt || this.generateTryOnPrompt(clothingPhotosBase64.length);
 
+    const userPhotoData = await this.urlOrBase64ToBase64(userPhotoBase64);
+    const clothingPhotosData = await Promise.all(
+      clothingPhotosBase64.map((photo) => this.urlOrBase64ToBase64(photo))
+    );
+
     const parts: GeminiPart[] = [
       { text: prompt },
       {
         inlineData: {
-          mimeType: this.getMimeType(userPhotoBase64),
-          data: this.extractBase64Data(userPhotoBase64),
+          mimeType: userPhotoData.mimeType,
+          data: userPhotoData.base64,
         },
       },
     ];
 
-    clothingPhotosBase64.forEach((photo) => {
+    clothingPhotosData.forEach((photoData) => {
       parts.push({
         inlineData: {
-          mimeType: this.getMimeType(photo),
-          data: this.extractBase64Data(photo),
+          mimeType: photoData.mimeType,
+          data: photoData.base64,
         },
       });
     });
@@ -93,6 +98,31 @@ export class NanoBananaService {
     }
 
     return `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+  }
+
+  private async urlOrBase64ToBase64(
+    input: string
+  ): Promise<{ mimeType: string; base64: string }> {
+    if (input.startsWith('data:')) {
+      const mimeType = this.getMimeType(input);
+      const base64 = this.extractBase64Data(input);
+      return { mimeType, base64 };
+    }
+
+    const response = await fetch(input);
+    const blob = await response.blob();
+    const mimeType = blob.type || 'image/jpeg';
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        const base64 = this.extractBase64Data(result);
+        resolve({ mimeType, base64 });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   }
 
   private getMimeType(base64String: string): string {
