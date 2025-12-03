@@ -140,9 +140,10 @@ export class NanoBananaService {
     Task: Warp and blend the clothing from the reference image(s) onto the person in the base image.
     
     Strict Requirements:
-    1. GARMENT FIDELITY: Maintain the exact texture, fabric material, logos, prints, and color of the reference clothing. Do not hallucinate new patterns or change the style.
-    2. PHYSICS: Ensure the clothing drapes naturally over the person's specific body shape, with realistic folds, shadows, and lighting matching the base image.
-    3. PRESERVATION: Keep the person's face, hair, body proportions, background, and pose 100% unchanged. High quality, 8k resolution.
+    1. GARMENT FIDELITY: Maintain the exact texture, fabric material, logos, prints, and color of the reference clothing. Do not hallucinate new patterns.
+    2. CLOTHING REPLACEMENT & ANATOMY: Completely replace the original clothing. If the new garment covers less of the body than the original (e.g., short sleeves vs. long sleeves, or shorts vs. trousers), YOU MUST realistically reconstruct the exposed skin (arms, legs). Ensure the generated skin tone matches the subject's face exactly.
+    3. PHYSICS: Ensure the clothing drapes naturally over the person's specific body shape, with realistic folds, shadows, and lighting matching the base image.
+    4. PRESERVATION: Keep the person's face, hair, body proportions, background, and pose 100% unchanged. High quality, 8k resolution.
   `;
     if (itemCount === 1) {
     return `${baseInstruction} Apply the single clothing item shown in the second image.`;
