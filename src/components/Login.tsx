@@ -45,7 +45,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-            <LogIn className="w-8 h-8 text-gray-900" />
+            <LogIn className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Iniciar Sesión</h1>
           <p className="mt-2 text-gray-600">Accede a tu closet virtual</p>
@@ -65,7 +65,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                 placeholder="tu@email.com"
               />
             </div>
@@ -84,7 +84,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                 placeholder="Tu contraseña"
               />
             </div>
@@ -99,7 +99,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
@@ -109,7 +109,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
           ¿No tienes una cuenta?{' '}
           <button
             onClick={onSwitchToRegister}
-            className="text-gray-900 hover:text-gray-800 font-medium"
+            className="text-black hover:text-gray-900 font-medium"
           >
             Regístrate
           </button>

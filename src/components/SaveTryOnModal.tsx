@@ -83,7 +83,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ej: Outfit para entrevista"
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all"
                   disabled={isSaving}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && name.trim()) {
@@ -97,7 +97,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
                 <button
                   onClick={handleSave}
                   disabled={!name.trim() || isSaving}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-lg shadow-gray-900/20"
+                  className="flex-1 flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-lg shadow-black/20"
                 >
                   {isSaving ? (
                     <>
