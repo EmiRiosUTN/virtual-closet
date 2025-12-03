@@ -245,7 +245,7 @@ export const OutfitManager = () => {
               className="text-center py-16 sm:py-24"
             >
               <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Heart className="w-10 h-10 text-neutral-900" />
+                <Heart className="w-10 h-10 text-white" />
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">
                 No has creado outfits aún
