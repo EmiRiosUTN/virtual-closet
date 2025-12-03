@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, User, AlertCircle, Heart, Maximize2, X } from 'lucide-react';
+import { Sparkles, User, AlertCircle, Heart, Maximize2, X, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingItem, UserPhoto, Outfit } from '../types';
 import { storageService } from '../services/storage';
@@ -126,6 +126,27 @@ export const VirtualTryOn = () => {
         <div className="flex items-center gap-3 mb-6">
           <Sparkles className="w-6 h-6 text-gray-400" />
           <h3 className="text-xl font-light text-gray-900">Prueba Virtual</h3>
+        </div>
+
+        <div className="mb-6 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <h4 className="text-sm font-medium text-amber-900">Tips para mejores resultados</h4>
+          </div>
+          <div className="space-y-3 text-sm text-amber-800 font-light">
+            <div className="flex items-start gap-2">
+              <span className="text-amber-600 font-medium mt-0.5">•</span>
+              <p><span className="font-medium">Fotos de prendas:</span> Usa un fondo liso y uniforme (blanco o claro preferiblemente). Asegúrate de que la prenda esté bien visible, extendida y sin arrugas.</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-amber-600 font-medium mt-0.5">•</span>
+              <p><span className="font-medium">Tus fotos:</span> Usa ropa ajustada o corta para obtener resultados más precisos. Una pose frontal con buena iluminación funciona mejor.</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-amber-600 font-medium mt-0.5">•</span>
+              <p><span className="font-medium">Calidad:</span> Fotos nítidas y con buena resolución producen mejores resultados en la simulación.</p>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-6">
