@@ -150,7 +150,7 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
                     onClick={() => setSelectedCategory(cat.value)}
                     className={`relative p-4 rounded-xl border-2 transition-all text-left ${
                       isSelected
-                        ? 'border-[zinc-900] bg-[zinc-900]/10 shadow-md'
+                        ? 'border-zinc-900 bg-zinc-900/10 shadow-md'
                         : 'border-neutral-200 hover:border-neutral-300 bg-white'
                     }`}
                     whileHover={{ scale: 1.02 }}
@@ -162,7 +162,7 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
                     {isSelected && (
                       <motion.div
                         layoutId="selected-category"
-                        className="absolute top-2 right-2 w-5 h-5 bg-[zinc-900] rounded-full flex items-center justify-center"
+                        className="absolute top-2 right-2 w-5 h-5 bg-zinc-900 rounded-full flex items-center justify-center"
                       >
                         <Check className="w-3 h-3 text-white" />
                       </motion.div>
@@ -222,10 +222,10 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
                 <label
                   className={`flex flex-col items-center justify-center w-full h-80 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
                     dragActive
-                      ? 'border-[zinc-900] bg-[zinc-900]/10'
+                      ? 'border-[zinc-900] bg-zinc-900/10'
                       : errors.file
                       ? 'border-red-300 bg-red-50'
-                      : 'border-neutral-300 hover:border-[zinc-900] hover:bg-[zinc-900]/5'
+                      : 'border-neutral-300 hover:border-zinc-900 hover:bg-zinc-900/5'
                   }`}
                 >
                   <motion.div
@@ -294,7 +294,7 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
           <motion.button
             type="submit"
             disabled={isUploading || !selectedFile || !itemName.trim()}
-            className="w-full bg-[zinc-900] text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-zinc-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >
