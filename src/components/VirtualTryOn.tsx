@@ -346,7 +346,7 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
               !selectedUserPhoto ||
               selectedClothingItems.length === 0
             }
-            className="w-full bg-gray-900 text-white py-4 rounded-xl font-light hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-zinc-900 text-white py-4 rounded-xl font-light hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isProcessing ? (
               <>
