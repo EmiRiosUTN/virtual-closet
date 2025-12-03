@@ -187,7 +187,7 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
           ¿Ya tienes una cuenta?{' '}
           <button
             onClick={onSwitchToLogin}
-            className="text-zinc-900 hover:text-gray-900 font-medium"
+            className="text-zinc-900 hover:text-zinc-800 font-medium"
           >
             Inicia sesión
           </button>
