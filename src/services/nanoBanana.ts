@@ -150,7 +150,7 @@ export class NanoBananaService {
   }
   
   return `${baseInstruction} Apply all clothing items shown in the additional images to create a cohesive outfit.`;
-}
+};
 
 export const createNanoBananaService = (apiKey: string) => {
   return new NanoBananaService(apiKey);
