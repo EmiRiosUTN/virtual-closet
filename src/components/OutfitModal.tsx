@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Edit2, Save, Trash2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Outfit, ClothingItem } from '../types';
@@ -56,7 +57,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
     }
   };
 
-  return (
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -213,6 +214,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
           )}
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 };

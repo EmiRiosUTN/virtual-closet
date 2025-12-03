@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Sparkles, User, AlertCircle, Heart, Maximize2, X, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingItem, UserPhoto, Outfit } from '../types';
@@ -382,14 +383,14 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
         </div>
       )}
 
-      <AnimatePresence>
-        {showImageModal && resultImage && (
-        <motion.div
+      {createPortal(
+        <AnimatePresence>
+          {showImageModal && resultImage && (
+          <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed top-0 left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
-          style={{ position: 'fixed' }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
           onClick={() => setShowImageModal(false)}
         >
           <motion.div
@@ -412,8 +413,10 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
             />
           </motion.div>
         </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {resultImage && (
         <SaveTryOnModal

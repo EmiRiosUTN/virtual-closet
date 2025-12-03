@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -33,7 +34,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
     onClose();
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -122,6 +123,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
