@@ -99,7 +99,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
