@@ -80,7 +80,7 @@ function AppContent() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <motion.div
-                className="w-12 h-12 bg-[#171936] rounded-2xl flex items-center justify-center shadow-lg"
+                className="w-12 h-12 bg-[zinc-900] rounded-2xl flex items-center justify-center shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -137,7 +137,7 @@ function AppContent() {
                     {isActive && (
                       <motion.div
                         layoutId="activeTab"
-                        className="absolute inset-0 bg-[#171936] rounded-xl"
+                        className="absolute inset-0 bg-[zinc-900] rounded-xl"
                         transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                       />
                     )}
@@ -169,7 +169,7 @@ function AppContent() {
                           }}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all mb-1 ${
                             isActive
-                              ? 'bg-[#171936] text-white shadow-md'
+                              ? 'bg-[zinc-900] text-white shadow-md'
                               : 'text-neutral-600 hover:bg-neutral-50'
                           }`}
                         >

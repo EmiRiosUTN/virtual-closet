@@ -39,10 +39,10 @@ const toastConfig = {
   },
   info: {
     icon: AlertCircle,
-    bgColor: 'bg-[#171936]/10',
-    textColor: 'text-[#171936]',
-    iconColor: 'text-[#171936]',
-    borderColor: 'border-[#171936]/20',
+    bgColor: 'bg-[zinc-900]/10',
+    textColor: 'text-[zinc-900]',
+    iconColor: 'text-[zinc-900]',
+    borderColor: 'border-[zinc-900]/20',
   },
 };
 

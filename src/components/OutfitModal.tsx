@@ -62,7 +62,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+      className="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -72,7 +72,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
         className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-[#171936] px-6 py-5 flex items-center justify-between">
+        <div className="bg-[zinc-900] px-6 py-5 flex items-center justify-between">
           <div className="flex-1">
             {isEditing ? (
               <input
@@ -94,7 +94,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
               <>
                 <motion.button
                   onClick={handleSave}
-                  className="p-2.5 bg-white text-[#171936] rounded-full hover:bg-[#171936]/10 transition-colors"
+                  className="p-2.5 bg-white text-[zinc-900] rounded-full hover:bg-[zinc-900]/10 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -117,7 +117,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
               <>
                 <motion.button
                   onClick={() => setIsEditing(true)}
-                  className="p-2.5 bg-white text-[#171936] rounded-full hover:bg-neutral-100 transition-colors"
+                  className="p-2.5 bg-white text-[zinc-900] rounded-full hover:bg-neutral-100 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -141,7 +141,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
             <div className="mb-6">
               <button
                 onClick={() => setShowItemSelector(!showItemSelector)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#171936]/10 text-[#171936] rounded-xl font-medium hover:bg-[#171936]/20 transition-colors border-2 border-[#171936]/20"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[zinc-900]/10 text-[zinc-900] rounded-xl font-medium hover:bg-[zinc-900]/20 transition-colors border-2 border-[zinc-900]/20"
               >
                 <Plus className="w-5 h-5" />
                 {showItemSelector ? 'Ocultar Selector' : 'Agregar Prendas'}
@@ -174,7 +174,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="group relative rounded-2xl overflow-hidden bg-white border-2 border-neutral-200 hover:border-[#171936]/30 hover:shadow-lg transition-all"
+                  className="group relative rounded-2xl overflow-hidden bg-white border-2 border-neutral-200 hover:border-[zinc-900]/30 hover:shadow-lg transition-all"
                 >
                   <div className="aspect-square bg-neutral-50">
                     <img

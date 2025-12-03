@@ -120,7 +120,7 @@ export const OutfitManager = () => {
       className="space-y-6"
     >
       <div className="bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden">
-        <div className="bg-[#171936] px-6 sm:px-8 py-6">
+        <div className="bg-[zinc-900] px-6 sm:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Heart className="w-7 h-7 text-white" />
@@ -134,7 +134,7 @@ export const OutfitManager = () => {
             {!isCreating && (
               <motion.button
                 onClick={() => setIsCreating(true)}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#171936] rounded-xl font-semibold hover:bg-neutral-100 transition-all shadow-lg"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[zinc-900] rounded-xl font-semibold hover:bg-neutral-100 transition-all shadow-lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -154,10 +154,10 @@ export const OutfitManager = () => {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-8 overflow-hidden"
               >
-                <div className="p-6 bg-[#171936]/50 rounded-2xl border-2 border-[#171936]/20 space-y-6">
+                <div className="p-6 bg-[zinc-900]/50 rounded-2xl border-2 border-[zinc-900]/20 space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-[#171936]" />
+                      <Sparkles className="w-5 h-5 text-[zinc-900]" />
                       Crear Nuevo Outfit
                     </h3>
                     <button
@@ -185,7 +185,7 @@ export const OutfitManager = () => {
                       className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${
                         nameError
                           ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                          : 'border-white focus:border-[#171936] focus:ring-teal-100'
+                          : 'border-white focus:border-[zinc-900] focus:ring-teal-100'
                       } focus:ring-4 outline-none bg-white`}
                     />
                     <AnimatePresence>
@@ -206,7 +206,7 @@ export const OutfitManager = () => {
                     <label className="block text-sm font-medium text-neutral-700 mb-3">
                       Selecciona las prendas ({selectedItems.length} seleccionadas)
                     </label>
-                    <div className="bg-white rounded-xl p-4 border-2 border-dashed border-[#171936]/30">
+                    <div className="bg-white rounded-xl p-4 border-2 border-dashed border-[zinc-900]/30">
                       <ClosetView
                         onItemSelect={handleItemSelect}
                         selectedItems={selectedItems.map((item) => item.id)}
@@ -217,7 +217,7 @@ export const OutfitManager = () => {
                   <div className="flex gap-3">
                     <motion.button
                       onClick={handleSaveOutfit}
-                      className="flex-1 bg-[#171936] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                      className="flex-1 bg-[zinc-900] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
@@ -244,8 +244,8 @@ export const OutfitManager = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-16 sm:py-24"
             >
-              <div className="w-20 h-20 bg-[#171936] rounded-full flex items-center justify-center mx-auto mb-6">
-                <Heart className="w-10 h-10 text-[#171936]" />
+              <div className="w-20 h-20 bg-[zinc-900] rounded-full flex items-center justify-center mx-auto mb-6">
+                <Heart className="w-10 h-10 text-[zinc-900]" />
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">
                 No has creado outfits aún
@@ -255,7 +255,7 @@ export const OutfitManager = () => {
               </p>
               <motion.button
                 onClick={() => setIsCreating(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#171936] text-white rounded-xl font-medium shadow-lg hover:bg-[#14152E] hover:shadow-xl transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[zinc-900] text-white rounded-xl font-medium shadow-lg hover:bg-[#14152E] hover:shadow-xl transition-all"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -275,7 +275,7 @@ export const OutfitManager = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.2 }}
                       whileHover={{ y: -8 }}
-                      className="group bg-white border-2 border-neutral-200 rounded-2xl overflow-hidden hover:border-[#171936]/30 hover:shadow-xl transition-all cursor-pointer"
+                      className="group bg-white border-2 border-neutral-200 rounded-2xl overflow-hidden hover:border-[zinc-900]/30 hover:shadow-xl transition-all cursor-pointer"
                       onClick={() => setSelectedOutfit(outfit)}
                     >
                       <div className="relative aspect-square bg-neutral-100 p-3">
@@ -305,7 +305,7 @@ export const OutfitManager = () => {
                               </div>
                             ))}
                             {items.length > 4 && (
-                              <div className="bg-[#171936] flex items-center justify-center rounded-xl shadow-sm">
+                              <div className="bg-[zinc-900] flex items-center justify-center rounded-xl shadow-sm">
                                 <span className="text-white font-semibold text-sm">
                                   +{items.length - 4}
                                 </span>
@@ -360,7 +360,7 @@ export const OutfitManager = () => {
                           <p className="text-sm text-neutral-500">
                             {items.length} {items.length === 1 ? 'prenda' : 'prendas'}
                           </p>
-                          <Heart className="w-4 h-4 text-[#171936] fill-[#171936]" />
+                          <Heart className="w-4 h-4 text-[zinc-900] fill-[zinc-900]" />
                         </div>
                       </div>
                     </motion.div>

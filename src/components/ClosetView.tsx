@@ -158,7 +158,7 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
                   onClick={() => setSelectedCategory(cat.value)}
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                     isSelected
-                      ? 'bg-[#171936] text-white shadow-lg'
+                      ? 'bg-[zinc-900] text-white shadow-lg'
                       : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                   }`}
                   whileHover={{ scale: 1.02 }}
@@ -177,7 +177,7 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-16 sm:py-24"
             >
-              <div className="w-20 h-20 bg-[#171936] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-[zinc-900] rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shirt className="w-10 h-10 text-white" />
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">
@@ -197,7 +197,7 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
                   onClick={onAddItemClick}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#171936] text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[zinc-900] text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
                 >
                   <Sparkles className="w-5 h-5" />
                   Agregar Prenda
@@ -217,7 +217,7 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
                       whileHover={!isSelected ? { y: -5, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } } : {}}
                       className={`group relative rounded-2xl overflow-hidden bg-white border-2 ${
                         isSelected
-                          ? 'border-[#667eea] shadow-[0_8px_16px_rgba(102,126,234,0.3)]'
+                          ? 'border-zinc-900 shadow-[0_8px_16px_rgba(24,24,27,0.3)]'
                           : 'border-[#e2e8f0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
                       } ${onItemSelect ? 'cursor-pointer' : ''}`}
                       style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -286,10 +286,10 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
                           className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10"
                           animate={{
                             scale: isSelected ? 1.1 : 1,
-                            background: isSelected ? 'linear-gradient(135deg, #667eea, #764ba2)' : '#ffffff',
-                            borderColor: isSelected ? '#667eea' : '#e2e8f0',
+                            background: isSelected ? '#18181b' : '#ffffff',
+                            borderColor: isSelected ? '#18181b' : '#e2e8f0',
                             boxShadow: isSelected
-                              ? '0 4px 12px rgba(102, 126, 234, 0.4)'
+                              ? '0 4px 12px rgba(24, 24, 27, 0.4)'
                               : '0 2px 8px rgba(0,0,0,0.15)',
                           }}
                           transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
