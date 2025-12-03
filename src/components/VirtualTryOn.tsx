@@ -225,7 +225,7 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                 }}
                 className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${
                   selectionMode === 'individual'
-                    ? 'bg-gray-900 text-white'
+                    ? 'bg-zinc-900 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
