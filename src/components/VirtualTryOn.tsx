@@ -120,8 +120,6 @@ export const VirtualTryOn = () => {
         clothingUrls
       );
 
-      setResultImage(resultUrl);
-
       const result = {
         id: crypto.randomUUID(),
         imageUrl: resultUrl,
@@ -131,6 +129,8 @@ export const VirtualTryOn = () => {
       };
 
       await storageService.saveTryOnResult(result);
+
+      setResultImage(resultUrl);
       setShowSaveModal(true);
     } catch (err) {
       setError(
