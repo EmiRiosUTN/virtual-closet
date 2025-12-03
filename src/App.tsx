@@ -137,7 +137,7 @@ function AppContent() {
                     {isActive && (
                       <motion.div
                         layoutId="activeTab"
-                        className="absolute inset-0 bg-[zinc-900] rounded-xl"
+                        className="absolute inset-0 bg-zinc-900 rounded-xl"
                         transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                       />
                     )}
@@ -169,7 +169,7 @@ function AppContent() {
                           }}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all mb-1 ${
                             isActive
-                              ? 'bg-[zinc-900] text-white shadow-md'
+                              ? 'bg-zinc-900 text-white shadow-md'
                               : 'text-neutral-600 hover:bg-neutral-50'
                           }`}
                         >
