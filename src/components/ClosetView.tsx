@@ -106,7 +106,7 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
       className="space-y-6"
     >
       <div className="bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden">
-        <div className="bg-[#171936] px-6 sm:px-8 py-6">
+        <div className="bg-black px-6 sm:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Shirt className="w-7 h-7 text-white" />
