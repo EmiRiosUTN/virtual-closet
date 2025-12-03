@@ -1,18 +1,19 @@
 import { useState } from 'react';
-import { Shirt, User, Sparkles, Heart, Menu, X, LogOut } from 'lucide-react';
+import { Shirt, User, Sparkles, Heart, Menu, X, LogOut, Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingUpload } from './components/ClothingUpload';
 import { UserPhotosUpload } from './components/UserPhotosUpload';
 import { ClosetView } from './components/ClosetView';
 import { VirtualTryOn } from './components/VirtualTryOn';
 import { OutfitManager } from './components/OutfitManager';
+import { TryOnGallery } from './components/TryOnGallery';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
 import Register from './components/Register';
 
-type Tab = 'closet' | 'photos' | 'tryOn' | 'outfits' | 'upload';
+type Tab = 'closet' | 'photos' | 'tryOn' | 'gallery' | 'outfits' | 'upload';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<Tab>('closet');
@@ -27,6 +28,7 @@ function AppContent() {
     { id: 'upload' as Tab, label: 'Agregar Prenda', icon: Shirt },
     { id: 'photos' as Tab, label: 'Mis Fotos', icon: User },
     { id: 'tryOn' as Tab, label: 'Prueba Virtual', icon: Sparkles },
+    { id: 'gallery' as Tab, label: 'Probador', icon: Image },
     { id: 'outfits' as Tab, label: 'Mis Outfits', icon: Heart },
   ];
 
@@ -207,6 +209,7 @@ function AppContent() {
             )}
             {activeTab === 'photos' && <UserPhotosUpload />}
             {activeTab === 'tryOn' && <VirtualTryOn />}
+            {activeTab === 'gallery' && <TryOnGallery />}
             {activeTab === 'outfits' && <OutfitManager />}
           </motion.main>
         </AnimatePresence>

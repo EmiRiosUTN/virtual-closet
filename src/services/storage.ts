@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { ClothingItem, UserPhoto, Outfit, VirtualTryOnResult } from '../types';
+import { ClothingItem, UserPhoto, Outfit, VirtualTryOnResult, SavedTryOn } from '../types';
 
 async function getCurrentUserId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -278,6 +278,67 @@ export const storageService = {
 
     if (error) {
       console.error('Error deleting try-on result:', error);
+      throw error;
+    }
+  },
+
+  async getSavedTryOns(): Promise<SavedTryOn[]> {
+    const { data, error } = await supabase
+      .from('virtual_tryons')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching saved try-ons:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async saveTryOn(
+    name: string,
+    userPhotoId: string,
+    clothingItemIds: string[],
+    imageUrl: string
+  ): Promise<void> {
+    const userId = await getCurrentUserId();
+
+    const { error } = await supabase
+      .from('virtual_tryons')
+      .insert({
+        name,
+        user_photo_id: userPhotoId,
+        clothing_item_ids: clothingItemIds,
+        result_image_url: imageUrl,
+        user_id: userId,
+      });
+
+    if (error) {
+      console.error('Error saving try-on:', error);
+      throw error;
+    }
+  },
+
+  async uploadTryOnImageFromUrl(imageUrl: string): Promise<string> {
+    const userId = await getCurrentUserId();
+
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    const file = new File([blob], `tryon-${Date.now()}.png`, { type: 'image/png' });
+
+    const fileName = `${userId}/tryons/${Date.now()}.png`;
+    return await uploadImage(file, 'try-on-results', fileName);
+  },
+
+  async deleteSavedTryOn(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('virtual_tryons')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting saved try-on:', error);
       throw error;
     }
   },

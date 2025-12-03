@@ -6,6 +6,7 @@ import { storageService } from '../services/storage';
 import { createNanoBananaService } from '../services/nanoBanana';
 import { ClosetView } from './ClosetView';
 import { useToast } from '../hooks/useToast';
+import { SaveTryOnModal } from './SaveTryOnModal';
 
 type SelectionMode = 'individual' | 'outfit';
 
@@ -21,7 +22,8 @@ export const VirtualTryOn = () => {
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const [showImageModal, setShowImageModal] = useState(false);
-  const { warning } = useToast();
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const { warning, success } = useToast();
 
   useEffect(() => {
     loadUserPhotos();
@@ -78,6 +80,26 @@ export const VirtualTryOn = () => {
     });
   };
 
+  const handleSaveTryOn = async (name: string) => {
+    if (!selectedUserPhoto || !resultImage) return;
+
+    try {
+      const uploadedImageUrl = await storageService.uploadTryOnImageFromUrl(resultImage);
+
+      await storageService.saveTryOn(
+        name,
+        selectedUserPhoto.id,
+        selectedClothingItems.map((item) => item.id),
+        uploadedImageUrl
+      );
+
+      success('Prueba virtual guardada exitosamente');
+    } catch (error) {
+      console.error('Error saving try-on:', error);
+      throw error;
+    }
+  };
+
   const handleTryOn = async () => {
     if (!selectedUserPhoto || selectedClothingItems.length === 0) {
       setError('Por favor selecciona una foto tuya y al menos una prenda');
@@ -109,6 +131,7 @@ export const VirtualTryOn = () => {
       };
 
       await storageService.saveTryOnResult(result);
+      setShowSaveModal(true);
     } catch (err) {
       setError(
         err instanceof Error
@@ -383,6 +406,15 @@ export const VirtualTryOn = () => {
         </motion.div>
         )}
       </AnimatePresence>
+
+      {resultImage && (
+        <SaveTryOnModal
+          isOpen={showSaveModal}
+          imageUrl={resultImage}
+          onSave={handleSaveTryOn}
+          onClose={() => setShowSaveModal(false)}
+        />
+      )}
     </div>
   );
 };
