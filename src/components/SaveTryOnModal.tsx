@@ -97,7 +97,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
                 <button
                   onClick={handleSave}
                   disabled={!name.trim() || isSaving}
-                  className="flex-1 flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-lg shadow-black/20"
+                  className="flex-1 flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-xl hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-lg shadow-black/20"
                 >
                   {isSaving ? (
                     <>
