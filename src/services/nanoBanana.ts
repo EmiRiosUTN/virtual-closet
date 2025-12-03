@@ -135,7 +135,7 @@ export class NanoBananaService {
   }
 
   private generateTryOnPrompt(itemCount: number): string {
-  const baseInstruction = `
+    const baseInstruction = `
     Photorealistic virtual try-on. 
     Task: Warp and blend the clothing from the reference image(s) onto the person in the base image.
     
@@ -144,13 +144,12 @@ export class NanoBananaService {
     2. PHYSICS: Ensure the clothing drapes naturally over the person's specific body shape, with realistic folds, shadows, and lighting matching the base image.
     3. PRESERVATION: Keep the person's face, hair, body proportions, background, and pose 100% unchanged. High quality, 8k resolution.
   `;
-
-  if (itemCount === 1) {
+    if (itemCount === 1) {
     return `${baseInstruction} Apply the single clothing item shown in the second image.`;
   }
-  
-  return `${baseInstruction} Apply all clothing items shown in the additional images to create a cohesive outfit.`;
-};
+    return `${baseInstruction} Apply all clothing items shown in the additional images to create a cohesive outfit.`;
+  }
+}
 
 export const createNanoBananaService = (apiKey: string) => {
   return new NanoBananaService(apiKey);
