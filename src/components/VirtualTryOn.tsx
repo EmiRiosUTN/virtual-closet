@@ -10,7 +10,11 @@ import { SaveTryOnModal } from './SaveTryOnModal';
 
 type SelectionMode = 'individual' | 'outfit';
 
-export const VirtualTryOn = () => {
+interface VirtualTryOnProps {
+  onNavigateToGallery?: () => void;
+}
+
+export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) => {
   const [userPhotos, setUserPhotos] = useState<UserPhoto[]>([]);
   const [selectedUserPhoto, setSelectedUserPhoto] = useState<UserPhoto | null>(null);
   const [selectedClothingItems, setSelectedClothingItems] = useState<ClothingItem[]>([]);
@@ -94,6 +98,10 @@ export const VirtualTryOn = () => {
       );
 
       success('Prueba virtual guardada exitosamente');
+
+      if (onNavigateToGallery) {
+        onNavigateToGallery();
+      }
     } catch (error) {
       console.error('Error saving try-on:', error);
       throw error;

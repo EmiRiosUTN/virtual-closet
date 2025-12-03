@@ -208,7 +208,7 @@ function AppContent() {
               <ClothingUpload onUploadComplete={handleUploadComplete} />
             )}
             {activeTab === 'photos' && <UserPhotosUpload />}
-            {activeTab === 'tryOn' && <VirtualTryOn />}
+            {activeTab === 'tryOn' && <VirtualTryOn onNavigateToGallery={() => setActiveTab('gallery')} />}
             {activeTab === 'gallery' && <TryOnGallery />}
             {activeTab === 'outfits' && <OutfitManager />}
           </motion.main>
