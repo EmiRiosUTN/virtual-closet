@@ -135,11 +135,21 @@ export class NanoBananaService {
   }
 
   private generateTryOnPrompt(itemCount: number): string {
-    if (itemCount === 1) {
-      return 'Make the person in the first image wear the clothing item shown in the second image. Keep their face, body proportions, and pose exactly the same. Only change the clothing to match the second image. Make it look natural and realistic.';
-    }
-    return 'Make the person in the first image wear all the clothing items shown in the additional images, creating a complete outfit. Keep their face, body proportions, and pose exactly the same. Only change the clothing. Make it look natural and realistic.';
+  const baseInstruction = `
+    Photorealistic virtual try-on. 
+    Task: Warp and blend the clothing from the reference image(s) onto the person in the base image.
+    
+    Strict Requirements:
+    1. GARMENT FIDELITY: Maintain the exact texture, fabric material, logos, prints, and color of the reference clothing. Do not hallucinate new patterns or change the style.
+    2. PHYSICS: Ensure the clothing drapes naturally over the person's specific body shape, with realistic folds, shadows, and lighting matching the base image.
+    3. PRESERVATION: Keep the person's face, hair, body proportions, background, and pose 100% unchanged. High quality, 8k resolution.
+  `;
+
+  if (itemCount === 1) {
+    return `${baseInstruction} Apply the single clothing item shown in the second image.`;
   }
+  
+  return `${baseInstruction} Apply all clothing items shown in the additional images to create a cohesive outfit.`;
 }
 
 export const createNanoBananaService = (apiKey: string) => {
