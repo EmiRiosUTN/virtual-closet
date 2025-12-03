@@ -120,7 +120,7 @@ export const OutfitManager = () => {
       className="space-y-6"
     >
       <div className="bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden">
-        <div className="bg-[zinc-900] px-6 sm:px-8 py-6">
+        <div className="bg-zinc-900 px-6 sm:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Heart className="w-7 h-7 text-white" />
@@ -154,7 +154,7 @@ export const OutfitManager = () => {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-8 overflow-hidden"
               >
-                <div className="p-6 bg-[zinc-900]/50 rounded-2xl border-2 border-[zinc-900]/20 space-y-6">
+                <div className="p-6 bg-zinc-900/50 rounded-2xl border-2 border-[zinc-900]/20 space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-[zinc-900]" />
@@ -217,7 +217,7 @@ export const OutfitManager = () => {
                   <div className="flex gap-3">
                     <motion.button
                       onClick={handleSaveOutfit}
-                      className="flex-1 bg-[zinc-900] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                      className="flex-1 bg-zinc-900 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
@@ -244,7 +244,7 @@ export const OutfitManager = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-16 sm:py-24"
             >
-              <div className="w-20 h-20 bg-[zinc-900] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Heart className="w-10 h-10 text-[zinc-900]" />
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">
@@ -255,7 +255,7 @@ export const OutfitManager = () => {
               </p>
               <motion.button
                 onClick={() => setIsCreating(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[zinc-900] text-white rounded-xl font-medium shadow-lg hover:bg-[#14152E] hover:shadow-xl transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white rounded-xl font-medium shadow-lg hover:bg-#14152E hover:shadow-xl transition-all"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -305,7 +305,7 @@ export const OutfitManager = () => {
                               </div>
                             ))}
                             {items.length > 4 && (
-                              <div className="bg-[zinc-900] flex items-center justify-center rounded-xl shadow-sm">
+                              <div className="bg-zinc-900 flex items-center justify-center rounded-xl shadow-sm">
                                 <span className="text-white font-semibold text-sm">
                                   +{items.length - 4}
                                 </span>
