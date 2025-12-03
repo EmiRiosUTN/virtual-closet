@@ -80,7 +80,7 @@ function AppContent() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <motion.div
-                className="w-12 h-12 bg-[zinc-900] rounded-2xl flex items-center justify-center shadow-lg"
+                className="w-12 h-12 bg-zinc-900 rounded-2xl flex items-center justify-center shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
