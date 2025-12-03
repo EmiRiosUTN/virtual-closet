@@ -95,17 +95,15 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
 
     setIsUploading(true);
     try {
-      const base64 = await fileToBase64(selectedFile);
-
       const newItem: ClothingItem = {
         id: crypto.randomUUID(),
         category: selectedCategory,
-        imageUrl: base64,
+        imageUrl: '',
         name: itemName.trim(),
         createdAt: Date.now(),
       };
 
-      await storageService.saveClothingItem(newItem);
+      await storageService.saveClothingItem(newItem, selectedFile);
 
       setItemName('');
       setPreviewUrl(null);

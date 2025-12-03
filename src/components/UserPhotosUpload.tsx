@@ -41,16 +41,14 @@ export const UserPhotosUpload = () => {
 
     setIsUploading(true);
     try {
-      const base64 = await fileToBase64(selectedFile);
-
       const newPhoto: UserPhoto = {
         id: crypto.randomUUID(),
-        imageUrl: base64,
+        imageUrl: '',
         angle: selectedAngle,
         createdAt: Date.now(),
       };
 
-      await storageService.saveUserPhoto(newPhoto);
+      await storageService.saveUserPhoto(newPhoto, selectedFile);
 
       setPreviewUrl(null);
       setSelectedFile(null);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Shirt, User, Sparkles, Heart, Menu, X } from 'lucide-react';
+import { Shirt, User, Sparkles, Heart, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingUpload } from './components/ClothingUpload';
 import { UserPhotosUpload } from './components/UserPhotosUpload';
@@ -8,14 +8,19 @@ import { VirtualTryOn } from './components/VirtualTryOn';
 import { OutfitManager } from './components/OutfitManager';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Login from './components/Login';
+import Register from './components/Register';
 
 type Tab = 'closet' | 'photos' | 'tryOn' | 'outfits' | 'upload';
 
-function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState<Tab>('closet');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [authView, setAuthView] = useState<'login' | 'register'>('login');
   const { toasts, removeToast, success } = useToast();
+  const { user, profile, loading, signOut } = useAuth();
 
   const tabs = [
     { id: 'closet' as Tab, label: 'Mi Closet', icon: Shirt },
@@ -30,6 +35,35 @@ function App() {
     setActiveTab('closet');
     success('Prenda agregada exitosamente');
   };
+
+  const handleSignOut = async () => {
+    await signOut();
+    success('Sesión cerrada exitosamente');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-neutral-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <ToastContainer toasts={toasts} onClose={removeToast} />
+        {authView === 'login' ? (
+          <Login onSwitchToRegister={() => setAuthView('register')} />
+        ) : (
+          <Register onSwitchToLogin={() => setAuthView('login')} />
+        )}
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50">
@@ -55,21 +89,30 @@ function App() {
                   Closet Virtual
                 </h1>
                 <p className="text-neutral-500 text-sm sm:text-base mt-1">
-                  Organiza tu ropa y prueba outfits con IA
+                  {profile ? `Hola, ${profile.first_name}` : 'Organiza tu ropa y prueba outfits con IA'}
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl hover:bg-white transition-all shadow-sm border border-neutral-200"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-neutral-700" />
-              ) : (
-                <Menu className="w-5 h-5 text-neutral-700" />
-              )}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSignOut}
+                className="hidden sm:flex items-center gap-2 px-4 py-2 text-neutral-700 hover:text-neutral-900 hover:bg-white rounded-xl transition-all shadow-sm border border-neutral-200"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm font-medium">Salir</span>
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2.5 rounded-xl hover:bg-white transition-all shadow-sm border border-neutral-200"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 text-neutral-700" />
+                ) : (
+                  <Menu className="w-5 h-5 text-neutral-700" />
+                )}
+              </button>
+            </div>
           </div>
 
           <nav className="relative">
@@ -122,7 +165,7 @@ function App() {
                             setActiveTab(tab.id);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all mb-1 last:mb-0 ${
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all mb-1 ${
                             isActive
                               ? 'bg-[#171936] text-white shadow-md'
                               : 'text-neutral-600 hover:bg-neutral-50'
@@ -133,6 +176,16 @@ function App() {
                         </button>
                       );
                     })}
+                    <button
+                      onClick={() => {
+                        handleSignOut();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-red-600 hover:bg-red-50 sm:hidden"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span>Cerrar Sesión</span>
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -165,6 +218,14 @@ function App() {
         </footer>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
