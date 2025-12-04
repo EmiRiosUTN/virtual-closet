@@ -136,7 +136,7 @@ export const UserPhotosUpload = () => {
           <button
             type="submit"
             disabled={isUploading || !selectedFile}
-            className="w-full bg-gray-900 text-white py-4 rounded-xl font-light hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full bg-zinc-900 text-white py-4 rounded-xl font-light hover:bg-zinc-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {isUploading ? 'Guardando...' : 'Guardar Foto'}
           </button>
