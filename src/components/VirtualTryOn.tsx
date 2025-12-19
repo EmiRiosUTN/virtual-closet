@@ -28,6 +28,7 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [stylePreference, setStylePreference] = useState('');
   const { warning, success } = useToast();
 
   useEffect(() => {
@@ -94,11 +95,13 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
       await storageService.saveTryOn(
         selectedUserPhoto.id,
         selectedClothingItems.map((item) => item.id),
-        uploadedImageUrl
+        uploadedImageUrl,
+        stylePreference || undefined
       );
 
       success('Prueba virtual guardada exitosamente');
       setShowSaveModal(false);
+      setStylePreference('');
 
       if (onNavigateToGallery) {
         onNavigateToGallery();
@@ -126,7 +129,8 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
 
       const resultUrl = await service.virtualTryOn(
         selectedUserPhoto.imageUrl,
-        clothingUrls
+        clothingUrls,
+        stylePreference.trim() ? `${stylePreference.trim()}. ` : undefined
       );
 
       setResultImage(resultUrl);
@@ -190,8 +194,8 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                     key={photo.id}
                     onClick={() => setSelectedUserPhoto(photo)}
                     className={`aspect-square rounded-xl overflow-hidden transition-all ${selectedUserPhoto?.id === photo.id
-                        ? 'ring-2 ring-gray-900'
-                        : 'opacity-60 hover:opacity-100'
+                      ? 'ring-2 ring-gray-900'
+                      : 'opacity-60 hover:opacity-100'
                       }`}
                   >
                     <img
@@ -213,8 +217,8 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                   setSelectedOutfit(null);
                 }}
                 className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${selectionMode === 'individual'
-                    ? 'bg-zinc-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-zinc-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
               >
                 <Sparkles className="w-4 h-4" />
@@ -226,8 +230,8 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                   setSelectedClothingItems([]);
                 }}
                 className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${selectionMode === 'outfit'
-                    ? 'bg-zinc-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-zinc-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
               >
                 <Heart className="w-4 h-4" />
@@ -314,6 +318,22 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                 )}
               </div>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-light text-gray-700 mb-3">
+              ¿Cómo te gustaría llevar esta prenda? (opcional)
+            </label>
+            <input
+              type="text"
+              value={stylePreference}
+              onChange={(e) => setStylePreference(e.target.value)}
+              placeholder="Ej: abrochada, desabrochada, manga larga, etc."
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-all font-light text-sm"
+            />
+            <p className="text-xs text-gray-500 font-light mt-2">
+              Describe detalles específicos sobre cómo quieres que se vea la prenda
+            </p>
           </div>
 
           {error && (

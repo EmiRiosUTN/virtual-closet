@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Shirt, User, Sparkles, Heart, Menu, X, LogOut, Image } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shirt, User, Sparkles, Heart, Menu, X, LogOut, Image, User as UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingUpload } from './components/ClothingUpload';
 import { UserPhotosUpload } from './components/UserPhotosUpload';
@@ -7,19 +7,24 @@ import { ClosetView } from './components/ClosetView';
 import { VirtualTryOn } from './components/VirtualTryOn';
 import { OutfitManager } from './components/OutfitManager';
 import { TryOnGallery } from './components/TryOnGallery';
+import { Profile } from './components/Profile';
+import { OnboardingWizard } from './components/OnboardingWizard';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { storageService } from './services/storage';
 import Login from './components/Login';
 import Register from './components/Register';
 
-type Tab = 'closet' | 'photos' | 'tryOn' | 'gallery' | 'outfits' | 'upload';
+type Tab = 'closet' | 'photos' | 'tryOn' | 'gallery' | 'outfits' | 'upload' | 'profile';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<Tab>('closet');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
   const { toasts, removeToast, success } = useToast();
   const { user, profile, loading, signOut } = useAuth();
 
@@ -30,6 +35,7 @@ function AppContent() {
     { id: 'tryOn' as Tab, label: 'Prueba Virtual', icon: Sparkles },
     { id: 'gallery' as Tab, label: 'Probador', icon: Image },
     { id: 'outfits' as Tab, label: 'Mis Outfits', icon: Heart },
+    { id: 'profile' as Tab, label: 'Mi Perfil', icon: UserIcon },
   ];
 
   const handleUploadComplete = () => {
@@ -43,7 +49,27 @@ function AppContent() {
     success('Sesión cerrada exitosamente');
   };
 
-  if (loading) {
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    setCheckingOnboarding(false);
+  };
+
+  // Check onboarding status when user logs in
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      if (user) {
+        const completed = await storageService.checkOnboardingStatus();
+        setShowOnboarding(!completed);
+        setCheckingOnboarding(false);
+      } else {
+        setCheckingOnboarding(false);
+      }
+    };
+
+    checkOnboarding();
+  }, [user]);
+
+  if (loading || checkingOnboarding) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50">
         <div className="text-center">
@@ -63,6 +89,16 @@ function AppContent() {
         ) : (
           <Register onSwitchToLogin={() => setAuthView('login')} />
         )}
+      </>
+    );
+  }
+
+  // Show onboarding wizard if not completed
+  if (showOnboarding) {
+    return (
+      <>
+        <ToastContainer toasts={toasts} onClose={removeToast} />
+        <OnboardingWizard onComplete={handleOnboardingComplete} />
       </>
     );
   }
@@ -126,11 +162,10 @@ function AppContent() {
                   <motion.button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex items-center gap-2.5 px-5 py-3 rounded-xl font-medium text-sm transition-all ${
-                      isActive
-                        ? 'text-white shadow-lg'
-                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
-                    }`}
+                    className={`relative flex items-center gap-2.5 px-5 py-3 rounded-xl font-medium text-sm transition-all ${isActive
+                      ? 'text-white shadow-lg'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                      }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -167,11 +202,10 @@ function AppContent() {
                             setActiveTab(tab.id);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all mb-1 ${
-                            isActive
-                              ? 'bg-zinc-900 text-white shadow-md'
-                              : 'text-neutral-600 hover:bg-neutral-50'
-                          }`}
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all mb-1 ${isActive
+                            ? 'bg-zinc-900 text-white shadow-md'
+                            : 'text-neutral-600 hover:bg-neutral-50'
+                            }`}
                         >
                           <Icon className="w-5 h-5" />
                           <span>{tab.label}</span>
@@ -211,6 +245,7 @@ function AppContent() {
             {activeTab === 'tryOn' && <VirtualTryOn onNavigateToGallery={() => setActiveTab('gallery')} />}
             {activeTab === 'gallery' && <TryOnGallery />}
             {activeTab === 'outfits' && <OutfitManager />}
+            {activeTab === 'profile' && <Profile />}
           </motion.main>
         </AnimatePresence>
       </div>

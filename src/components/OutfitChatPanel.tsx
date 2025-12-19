@@ -1,0 +1,311 @@
+import { useState, useEffect, useRef } from 'react';
+import { X, Send, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import { createGeminiChatService } from '../services/geminiChat';
+import { storageService } from '../services/storage';
+import { useToast } from '../hooks/useToast';
+import type { ChatMessage, SavedTryOn } from '../types';
+
+interface OutfitChatPanelProps {
+    tryOn: SavedTryOn;
+    userPhotoUrl: string;
+    clothingPhotosUrls: string[];
+    onClose: () => void;
+}
+
+export function OutfitChatPanel({
+    tryOn,
+    userPhotoUrl,
+    clothingPhotosUrls,
+    onClose,
+}: OutfitChatPanelProps) {
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [initializing, setInitializing] = useState(true);
+    const [chatLimit, setChatLimit] = useState({ remaining: 15, allowed: true });
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [userGender, setUserGender] = useState<string | undefined>();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const { error: showError } = useToast();
+
+    useEffect(() => {
+        loadChatData();
+    }, [tryOn.id]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const loadChatData = async () => {
+        try {
+            // Load user profile for gender
+            const profile = await storageService.getUserProfile();
+            setUserGender(profile?.gender);
+
+            // Load existing messages
+            const existingMessages = await storageService.getChatMessages(tryOn.id);
+
+            if (existingMessages.length > 0) {
+                // Messages already exist, just load them
+                setMessages(existingMessages);
+                setInitializing(false);
+            } else {
+                // No messages yet, generate initial recommendations
+                await generateInitialRecommendations();
+            }
+
+            // Load chat limit
+            const limit = await storageService.getChatLimit();
+            if (limit) {
+                const remaining = 15 - limit.message_count;
+                setChatLimit({ remaining: Math.max(0, remaining), allowed: remaining > 0 });
+            }
+        } catch (err) {
+            console.error('Error loading chat data:', err);
+            showError('Error al cargar el chat');
+        } finally {
+            setInitializing(false);
+        }
+    };
+
+    const generateInitialRecommendations = async () => {
+        setLoading(true);
+        try {
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            const chatService = createGeminiChatService(apiKey);
+
+            const recommendations = await chatService.generateOutfitRecommendations(
+                userPhotoUrl,
+                clothingPhotosUrls,
+                tryOn.result_image_url,
+                userGender
+            );
+
+            const assistantMessage: ChatMessage = {
+                id: crypto.randomUUID(),
+                user_id: tryOn.user_id,
+                try_on_result_id: tryOn.id,
+                role: 'assistant',
+                content: recommendations,
+                created_at: new Date().toISOString(),
+            };
+
+            await storageService.saveChatMessage(tryOn.id, 'assistant', recommendations);
+            setMessages([assistantMessage]);
+        } catch (err) {
+            console.error('Error generating recommendations:', err);
+            showError('Error al generar recomendaciones');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSendMessage = async () => {
+        if (!input.trim() || loading) return;
+
+        // Check chat limit
+        const limitCheck = await storageService.checkAndIncrementChatLimit();
+        if (!limitCheck.allowed) {
+            showError('Has alcanzado el límite de 15 mensajes por día. Vuelve mañana.');
+            setChatLimit({ remaining: 0, allowed: false });
+            return;
+        }
+
+        setChatLimit({ remaining: limitCheck.remaining, allowed: true });
+
+        const userMessage: ChatMessage = {
+            id: crypto.randomUUID(),
+            user_id: tryOn.user_id,
+            try_on_result_id: tryOn.id,
+            role: 'user',
+            content: input.trim(),
+            created_at: new Date().toISOString(),
+        };
+
+        setMessages((prev) => [...prev, userMessage]);
+        await storageService.saveChatMessage(tryOn.id, 'user', input.trim());
+
+        const userInput = input.trim();
+        setInput('');
+        setLoading(true);
+
+        try {
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            const chatService = createGeminiChatService(apiKey);
+
+            const conversationHistory = messages.map((msg) => ({
+                role: msg.role,
+                content: msg.content,
+            }));
+
+            const response = await chatService.sendChatMessage(
+                userInput,
+                userPhotoUrl,
+                clothingPhotosUrls,
+                tryOn.result_image_url,
+                conversationHistory,
+                userGender
+            );
+
+            const assistantMessage: ChatMessage = {
+                id: crypto.randomUUID(),
+                user_id: tryOn.user_id,
+                try_on_result_id: tryOn.id,
+                role: 'assistant',
+                content: response,
+                created_at: new Date().toISOString(),
+            };
+
+            setMessages((prev) => [...prev, assistantMessage]);
+            await storageService.saveChatMessage(tryOn.id, 'assistant', response);
+        } catch (err) {
+            console.error('Error sending message:', err);
+            showError('Error al enviar el mensaje');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: isCollapsed ? 'calc(100% - 48px)' : 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed right-0 top-0 h-[100dvh] w-full sm:w-[480px] bg-white shadow-2xl border-l border-gray-200 flex flex-col z-[10001]"
+            >
+                {/* Collapse/Expand Button */}
+                <button
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full bg-white border border-r-0 border-gray-200 rounded-l-xl p-2 hover:bg-gray-50 transition-colors shadow-lg"
+                >
+                    {isCollapsed ? (
+                        <ChevronLeft className="w-5 h-5 text-gray-600" />
+                    ) : (
+                        <ChevronRight className="w-5 h-5 text-gray-600" />
+                    )}
+                </button>
+
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Recomendaciones IA</h3>
+                            <p className="text-xs text-gray-500">
+                                {chatLimit.remaining} mensajes restantes hoy
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-white/50 rounded-xl transition-colors"
+                    >
+                        <X className="w-5 h-5 text-gray-600" />
+                    </button>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {initializing ? (
+                        <div className="flex items-center justify-center h-full">
+                            <div className="text-center">
+                                <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                <p className="text-sm text-gray-500">Generando recomendaciones...</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {messages.map((message) => (
+                                <div
+                                    key={message.id}
+                                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                >
+                                    <div
+                                        className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.role === 'user'
+                                            ? 'bg-black text-white'
+                                            : 'bg-gradient-to-br from-purple-50 to-pink-50 text-gray-900 border border-purple-100'
+                                            }`}
+                                    >
+                                        {message.role === 'assistant' ? (
+                                            <div className="text-sm prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-li:my-1">
+                                                <ReactMarkdown>{message.content}</ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                        )}
+                                        <p
+                                            className={`text-xs mt-2 ${message.role === 'user' ? 'text-gray-300' : 'text-gray-500'
+                                                }`}
+                                        >
+                                            {new Date(message.created_at).toLocaleTimeString('es-ES', {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                            {loading && (
+                                <div className="flex justify-start">
+                                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl px-4 py-3 border border-purple-100">
+                                        <div className="flex gap-2">
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                        </>
+                    )}
+                </div>
+
+                {/* Instructions */}
+                {!initializing && messages.length > 0 && (
+                    <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 border-t border-purple-100">
+                        <p className="text-xs text-gray-600 text-center">
+                            💬 Pregúntame sobre combinaciones, accesorios, ocasiones o estilos para este outfit
+                        </p>
+                    </div>
+                )}
+
+                {/* Input */}
+                <div className="p-4 pb-6 sm:pb-8 border-t border-gray-200 bg-white">
+                    <div className="flex gap-2 mb-2">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                            placeholder={
+                                chatLimit.allowed
+                                    ? 'Escribe tu pregunta...'
+                                    : 'Límite alcanzado por hoy'
+                            }
+                            disabled={loading || !chatLimit.allowed}
+                            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all text-sm disabled:bg-gray-50 disabled:cursor-not-allowed"
+                        />
+                        <button
+                            onClick={handleSendMessage}
+                            disabled={loading || !input.trim() || !chatLimit.allowed}
+                            className="px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/30"
+                        >
+                            <Send className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        </AnimatePresence>
+    );
+}
