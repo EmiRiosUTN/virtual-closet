@@ -284,7 +284,7 @@ export const storageService = {
 
   async getSavedTryOns(): Promise<SavedTryOn[]> {
     const { data, error } = await supabase
-      .from('virtual_tryons')
+      .from('try_on_results')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -293,11 +293,17 @@ export const storageService = {
       return [];
     }
 
-    return data || [];
+    return (data || []).map(item => ({
+      id: item.id,
+      user_id: item.user_id,
+      user_photo_id: item.user_photo_id,
+      clothing_item_ids: item.clothing_item_ids || [],
+      result_image_url: item.result_image_url,
+      created_at: item.created_at,
+    }));
   },
 
   async saveTryOn(
-    name: string,
     userPhotoId: string,
     clothingItemIds: string[],
     imageUrl: string
@@ -305,12 +311,11 @@ export const storageService = {
     const userId = await getCurrentUserId();
 
     const { error } = await supabase
-      .from('virtual_tryons')
+      .from('try_on_results')
       .insert({
-        name,
+        result_image_url: imageUrl,
         user_photo_id: userPhotoId,
         clothing_item_ids: clothingItemIds,
-        result_image_url: imageUrl,
         user_id: userId,
       });
 
@@ -333,7 +338,7 @@ export const storageService = {
 
   async deleteSavedTryOn(id: string): Promise<void> {
     const { error } = await supabase
-      .from('virtual_tryons')
+      .from('try_on_results')
       .delete()
       .eq('id', id);
 

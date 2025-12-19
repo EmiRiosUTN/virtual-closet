@@ -102,7 +102,7 @@ export const TryOnGallery = () => {
               <div className="aspect-[3/4] relative">
                 <img
                   src={tryOn.result_image_url}
-                  alt={tryOn.name}
+                  alt="Prueba virtual"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -126,7 +126,7 @@ export const TryOnGallery = () => {
               </div>
 
               <div className="p-4 bg-white">
-                <h4 className="font-medium text-gray-900 truncate mb-1">{tryOn.name}</h4>
+                <h4 className="font-medium text-gray-900 truncate mb-1">Prueba Virtual</h4>
                 <p className="text-xs text-gray-500 font-light">
                   {new Date(tryOn.created_at).toLocaleDateString('es-AR', {
                     year: 'numeric',
@@ -167,12 +167,12 @@ export const TryOnGallery = () => {
               <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src={selectedImage.result_image_url}
-                  alt={selectedImage.name}
+                  alt="Prueba virtual"
                   className="w-full h-auto max-h-[60vh] object-contain"
                 />
                 <div className="p-6 border-t border-gray-100">
                   <h3 className="text-xl font-medium text-gray-900 mb-2">
-                    {selectedImage.name}
+                    Prueba Virtual
                   </h3>
                   <p className="text-sm text-gray-500 font-light">
                     Guardado el {new Date(selectedImage.created_at).toLocaleDateString('es-AR', {

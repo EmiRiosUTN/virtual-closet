@@ -6,32 +6,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface SaveTryOnModalProps {
   isOpen: boolean;
   imageUrl: string;
-  onSave: (name: string) => Promise<void>;
+  onSave: () => Promise<void>;
   onClose: () => void;
 }
 
 export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnModalProps) {
-  const [name, setName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
-
     setIsSaving(true);
     try {
-      await onSave(name.trim());
-      setName('');
+      await onSave();
       onClose();
     } catch (error) {
       console.error('Error saving try-on:', error);
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleClose = () => {
-    setName('');
-    onClose();
   };
 
   return createPortal(
@@ -42,7 +33,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
-          onClick={handleClose}
+          onClick={onClose}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -56,7 +47,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
                 ¿Guardar prueba virtual?
               </h2>
               <button
-                onClick={handleClose}
+                onClick={onClose}
                 className="p-2 hover:bg-neutral-100 rounded-xl transition-colors"
                 disabled={isSaving}
               >
@@ -73,30 +64,14 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
                 />
               </div>
 
-              <div>
-                <label htmlFor="tryon-name" className="block text-sm font-medium text-neutral-700 mb-2">
-                  Nombre de la prueba
-                </label>
-                <input
-                  id="tryon-name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ej: Outfit para entrevista"
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all"
-                  disabled={isSaving}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && name.trim()) {
-                      handleSave();
-                    }
-                  }}
-                />
-              </div>
+              <p className="text-sm text-neutral-600 text-center">
+                Esta prueba virtual se guardará en tu galería
+              </p>
 
               <div className="flex gap-3">
                 <button
                   onClick={handleSave}
-                  disabled={!name.trim() || isSaving}
+                  disabled={isSaving}
                   className="flex-1 flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-xl hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-lg shadow-black/20"
                 >
                   {isSaving ? (
@@ -112,7 +87,7 @@ export function SaveTryOnModal({ isOpen, imageUrl, onSave, onClose }: SaveTryOnM
                   )}
                 </button>
                 <button
-                  onClick={handleClose}
+                  onClick={onClose}
                   disabled={isSaving}
                   className="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-xl hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
                 >

@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /closet/
+  RewriteBase /
+
+  # Don't rewrite files in /assets/ folder
+  RewriteCond %{REQUEST_URI} ^/assets/ [OR]
+  RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$ [NC]
+  RewriteRule ^ - [L]
 
   # Don't rewrite files or directories that exist
   RewriteCond %{REQUEST_FILENAME} !-f

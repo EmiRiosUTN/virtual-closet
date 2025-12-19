@@ -51,7 +51,6 @@ export interface VirtualTryOnResult {
 export interface SavedTryOn {
   id: string;
   user_id: string;
-  name: string;
   user_photo_id: string;
   clothing_item_ids: string[];
   result_image_url: string;

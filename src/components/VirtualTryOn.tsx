@@ -85,20 +85,20 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
     });
   };
 
-  const handleSaveTryOn = async (name: string) => {
+  const handleSaveTryOn = async () => {
     if (!selectedUserPhoto || !resultImage) return;
 
     try {
       const uploadedImageUrl = await storageService.uploadTryOnImageFromUrl(resultImage);
 
       await storageService.saveTryOn(
-        name,
         selectedUserPhoto.id,
         selectedClothingItems.map((item) => item.id),
         uploadedImageUrl
       );
 
       success('Prueba virtual guardada exitosamente');
+      setShowSaveModal(false);
 
       if (onNavigateToGallery) {
         onNavigateToGallery();
