@@ -129,16 +129,6 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
         clothingUrls
       );
 
-      const result = {
-        id: crypto.randomUUID(),
-        imageUrl: resultUrl,
-        userPhotoId: selectedUserPhoto.id,
-        clothingItemIds: selectedClothingItems.map((item) => item.id),
-        createdAt: Date.now(),
-      };
-
-      await storageService.saveTryOnResult(result);
-
       setResultImage(resultUrl);
       setShowSaveModal(true);
     } catch (err) {
@@ -199,11 +189,10 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                   <button
                     key={photo.id}
                     onClick={() => setSelectedUserPhoto(photo)}
-                    className={`aspect-square rounded-xl overflow-hidden transition-all ${
-                      selectedUserPhoto?.id === photo.id
+                    className={`aspect-square rounded-xl overflow-hidden transition-all ${selectedUserPhoto?.id === photo.id
                         ? 'ring-2 ring-gray-900'
                         : 'opacity-60 hover:opacity-100'
-                    }`}
+                      }`}
                   >
                     <img
                       src={photo.imageUrl}
@@ -223,11 +212,10 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                   setSelectionMode('individual');
                   setSelectedOutfit(null);
                 }}
-                className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${
-                  selectionMode === 'individual'
+                className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${selectionMode === 'individual'
                     ? 'bg-zinc-900 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 <Sparkles className="w-4 h-4" />
                 Prendas Individuales
@@ -237,11 +225,10 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                   setSelectionMode('outfit');
                   setSelectedClothingItems([]);
                 }}
-                className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${
-                  selectionMode === 'outfit'
+                className={`flex-1 px-4 py-3 rounded-xl font-light transition-colors flex items-center justify-center gap-2 ${selectionMode === 'outfit'
                     ? 'bg-zinc-900 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 <Heart className="w-4 h-4" />
                 Mis Outfits
@@ -279,19 +266,16 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
                         <button
                           key={outfit.id}
                           onClick={() => handleOutfitSelect(outfit)}
-                          className={`relative text-left rounded-xl overflow-hidden transition-all hover:shadow-lg ${
-                            isSelected ? 'ring-2 ring-gray-900' : ''
-                          }`}
+                          className={`relative text-left rounded-xl overflow-hidden transition-all hover:shadow-lg ${isSelected ? 'ring-2 ring-gray-900' : ''
+                            }`}
                         >
                           <div className="aspect-square bg-gray-50 p-2 grid grid-cols-2 gap-2">
                             {items.slice(0, 4).map((item, index) => (
                               <div
                                 key={item.id}
-                                className={`rounded-lg overflow-hidden ${
-                                  items.length === 1 ? 'col-span-2 row-span-2' : ''
-                                } ${
-                                  items.length === 3 && index === 0 ? 'col-span-2' : ''
-                                }`}
+                                className={`rounded-lg overflow-hidden ${items.length === 1 ? 'col-span-2 row-span-2' : ''
+                                  } ${items.length === 3 && index === 0 ? 'col-span-2' : ''
+                                  }`}
                               >
                                 <img
                                   src={item.imageUrl}
@@ -386,33 +370,33 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
       {createPortal(
         <AnimatePresence>
           {showImageModal && resultImage && (
-          <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
-          onClick={() => setShowImageModal(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
-            className="relative max-w-lg w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
               onClick={() => setShowImageModal(false)}
-              className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
             >
-              <X className="w-6 h-6" />
-            </button>
-            <img
-              src={resultImage}
-              alt="Virtual try-on result full size"
-              className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
-            />
-          </motion.div>
-        </motion.div>
+              <motion.div
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="relative max-w-lg w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setShowImageModal(false)}
+                  className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                <img
+                  src={resultImage}
+                  alt="Virtual try-on result full size"
+                  className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+                />
+              </motion.div>
+            </motion.div>
           )}
         </AnimatePresence>,
         document.body
