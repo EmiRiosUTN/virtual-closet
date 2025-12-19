@@ -48,7 +48,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
             <LogIn className="w-8 h-8 text-zinc-900" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Iniciar Sesión</h1>
-          <p className="mt-2 text-gray-600">Accede a tu closet virtual</p>
+          <p className="mt-2 text-gray-600">Accede a Chicas Guapas AI</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -106,13 +106,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
         </form>
 
         <div className="text-center text-sm text-gray-600">
-          ¿No tienes una cuenta?{' '}
-          <button
-            onClick={onSwitchToRegister}
-            className="text-zinc-900 hover:text-gray-900 font-medium"
-          >
-            Regístrate
-          </button>
+          ¿Necesitas una cuenta? Contacta al administrador.
         </div>
       </div>
     </div>

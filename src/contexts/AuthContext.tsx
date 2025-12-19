@@ -7,6 +7,7 @@ interface Profile {
   first_name: string;
   last_name: string;
   email: string;
+  role?: 'user' | 'admin';
 }
 
 interface AuthContextType {
@@ -57,13 +58,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function loadProfile(userId: string) {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
       if (error) throw error;
-      setProfile(data);
+
+      // Map user_profiles data to Profile format
+      if (data) {
+        setProfile({
+          id: data.id,
+          first_name: data.first_name || '',
+          last_name: data.last_name || '',
+          email: '', // Will be filled from auth user
+          role: data.role,
+        });
+      }
     } catch (error) {
       console.error('Error loading profile:', error);
     } finally {

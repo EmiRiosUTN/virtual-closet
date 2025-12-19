@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shirt, User, Sparkles, Heart, Menu, X, LogOut, Image, User as UserIcon } from 'lucide-react';
+import { Shirt, User, Sparkles, Heart, Menu, X, LogOut, Image, User as UserIcon, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClothingUpload } from './components/ClothingUpload';
 import { UserPhotosUpload } from './components/UserPhotosUpload';
@@ -8,6 +8,7 @@ import { VirtualTryOn } from './components/VirtualTryOn';
 import { OutfitManager } from './components/OutfitManager';
 import { TryOnGallery } from './components/TryOnGallery';
 import { Profile } from './components/Profile';
+import { AdminPanel } from './components/AdminPanel';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
@@ -16,7 +17,7 @@ import { storageService } from './services/storage';
 import Login from './components/Login';
 import Register from './components/Register';
 
-type Tab = 'closet' | 'photos' | 'tryOn' | 'gallery' | 'outfits' | 'upload' | 'profile';
+type Tab = 'closet' | 'photos' | 'tryOn' | 'gallery' | 'outfits' | 'upload' | 'profile' | 'admin';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<Tab>('closet');
@@ -36,6 +37,7 @@ function AppContent() {
     { id: 'gallery' as Tab, label: 'Probador', icon: Image },
     { id: 'outfits' as Tab, label: 'Mis Outfits', icon: Heart },
     { id: 'profile' as Tab, label: 'Mi Perfil', icon: UserIcon },
+    ...(profile?.role === 'admin' ? [{ id: 'admin' as Tab, label: 'Admin', icon: Shield }] : []),
   ];
 
   const handleUploadComplete = () => {
@@ -124,7 +126,7 @@ function AppContent() {
               </motion.div>
               <div>
                 <h1 className="text-3xl sm:text-4xl font-semibold text-neutral-900 tracking-tight">
-                  Closet Virtual
+                  Chicas Guapas AI
                 </h1>
                 <p className="text-neutral-500 text-sm sm:text-base mt-1">
                   {profile ? `Hola, ${profile.first_name}` : 'Organiza tu ropa y prueba outfits con IA'}
@@ -246,6 +248,7 @@ function AppContent() {
             {activeTab === 'gallery' && <TryOnGallery />}
             {activeTab === 'outfits' && <OutfitManager />}
             {activeTab === 'profile' && <Profile />}
+            {activeTab === 'admin' && profile?.role === 'admin' && <AdminPanel />}
           </motion.main>
         </AnimatePresence>
       </div>

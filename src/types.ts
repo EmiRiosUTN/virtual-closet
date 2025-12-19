@@ -78,6 +78,7 @@ export interface UserProfile {
   terms_accepted_at?: string;
   onboarding_completed: boolean;
   onboarding_completed_at?: string;
+  role: 'user' | 'admin';
   created_at: string;
   updated_at: string;
 }

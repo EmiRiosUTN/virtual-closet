@@ -108,7 +108,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 <Sparkles className="w-12 h-12 text-white" />
             </motion.div>
             <h1 className="text-4xl font-bold text-gray-900">
-                ¡Bienvenido a Closet Virtual!
+                ¡Bienvenido a Chicas Guapas AI!
             </h1>
             <p className="text-lg text-gray-600 max-w-md mx-auto">
                 Vamos a configurar tu perfil para brindarte la mejor experiencia personalizada
