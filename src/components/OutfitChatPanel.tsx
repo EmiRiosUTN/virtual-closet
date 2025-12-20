@@ -50,15 +50,7 @@ export function OutfitChatPanel({
 
             // Load existing messages
             const existingMessages = await storageService.getChatMessages(tryOn.id);
-
-            if (existingMessages.length > 0) {
-                // Messages already exist, just load them
-                setMessages(existingMessages);
-                setInitializing(false);
-            } else {
-                // No messages yet, generate initial recommendations
-                await generateInitialRecommendations();
-            }
+            setMessages(existingMessages);
 
             // Load chat limit
             const limit = await storageService.getChatLimit();
@@ -74,37 +66,7 @@ export function OutfitChatPanel({
         }
     };
 
-    const generateInitialRecommendations = async () => {
-        setLoading(true);
-        try {
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-            const chatService = createGeminiChatService(apiKey);
 
-            const recommendations = await chatService.generateOutfitRecommendations(
-                userPhotoUrl,
-                clothingPhotosUrls,
-                tryOn.result_image_url,
-                userGender
-            );
-
-            const assistantMessage: ChatMessage = {
-                id: crypto.randomUUID(),
-                user_id: tryOn.user_id,
-                try_on_result_id: tryOn.id,
-                role: 'assistant',
-                content: recommendations,
-                created_at: new Date().toISOString(),
-            };
-
-            await storageService.saveChatMessage(tryOn.id, 'assistant', recommendations);
-            setMessages([assistantMessage]);
-        } catch (err) {
-            console.error('Error generating recommendations:', err);
-            showError('Error al generar recomendaciones');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSendMessage = async () => {
         if (!input.trim() || loading) return;
@@ -200,7 +162,7 @@ export function OutfitChatPanel({
                             <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900">Recomendaciones IA</h3>
+                            <h3 className="font-semibold text-gray-900">Asistente de Moda IA</h3>
                             <p className="text-xs text-gray-500">
                                 {chatLimit.remaining} mensajes restantes hoy
                             </p>
@@ -220,7 +182,26 @@ export function OutfitChatPanel({
                         <div className="flex items-center justify-center h-full">
                             <div className="text-center">
                                 <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                                <p className="text-sm text-gray-500">Generando recomendaciones...</p>
+                                <p className="text-sm text-gray-500">Cargando chat...</p>
+                            </div>
+                        </div>
+                    ) : messages.length === 0 ? (
+                        <div className="flex items-center justify-center h-full">
+                            <div className="text-center max-w-sm px-4">
+                                <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Sparkles className="w-8 h-8 text-purple-500" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">¡Hola! 👋</h3>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Soy tu asistente de moda. Pregúntame sobre:
+                                </p>
+                                <ul className="text-sm text-gray-600 text-left space-y-2">
+                                    <li>✨ Combinaciones de colores</li>
+                                    <li>👗 Accesorios que combinen</li>
+                                    <li>👠 Sugerencias de calzado</li>
+                                    <li>🎉 Ocasiones para usar este outfit</li>
+                                    <li>💡 Consejos de estilo</li>
+                                </ul>
                             </div>
                         </div>
                     ) : (
@@ -271,14 +252,7 @@ export function OutfitChatPanel({
                     )}
                 </div>
 
-                {/* Instructions */}
-                {!initializing && messages.length > 0 && (
-                    <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 border-t border-purple-100">
-                        <p className="text-xs text-gray-600 text-center">
-                            💬 Pregúntame sobre combinaciones, accesorios, ocasiones o estilos para este outfit
-                        </p>
-                    </div>
-                )}
+
 
                 {/* Input */}
                 <div className="p-4 pb-6 sm:pb-8 border-t border-gray-200 bg-white">

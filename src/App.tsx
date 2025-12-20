@@ -129,7 +129,7 @@ function AppContent() {
                   Chicas Guapas AI
                 </h1>
                 <p className="text-neutral-500 text-sm sm:text-base mt-1">
-                  {profile ? `Hola, ${profile.first_name}` : 'Organiza tu ropa y prueba outfits con IA'}
+                  {profile?.first_name ? `Hola, ${profile.first_name}` : 'Organiza tu ropa y prueba outfits con IA'}
                 </p>
               </div>
             </div>

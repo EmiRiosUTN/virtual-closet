@@ -9,7 +9,8 @@ export type ClothingCategory =
   | 'Chalecos'
   | 'Camperas'
   | 'Accesorios'
-  | 'Zapatos';
+  | 'Zapatos'
+  | 'Otros';
 
 export interface ClothingItem {
   id: string;
@@ -70,8 +71,11 @@ export type StylePreference =
   | 'vintage'
   | 'streetwear';
 
+
 export interface UserProfile {
   id: string;
+  first_name?: string;
+  last_name?: string;
   gender?: Gender;
   style_preferences?: StylePreference[];
   terms_accepted: boolean;

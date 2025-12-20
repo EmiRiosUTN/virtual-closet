@@ -20,6 +20,7 @@ const categories: { value: ClothingCategory; label: string }[] = [
   { value: 'Camperas', label: 'Camperas' },
   { value: 'Accesorios', label: 'Accesorios' },
   { value: 'Zapatos', label: 'Zapatos' },
+  { value: 'Otros', label: 'Otros' },
 ];
 
 export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
@@ -148,11 +149,10 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
                     key={cat.value}
                     type="button"
                     onClick={() => setSelectedCategory(cat.value)}
-                    className={`relative p-4 rounded-xl border-2 transition-all text-left ${
-                      isSelected
+                    className={`relative p-4 rounded-xl border-2 transition-all text-left ${isSelected
                         ? 'border-zinc-900 bg-zinc-900/10 shadow-md'
                         : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                    }`}
+                      }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -187,11 +187,10 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
               }}
               onBlur={() => validateName(itemName)}
               placeholder="Ej: Blusa blanca de seda"
-              className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${
-                errors.name
+              className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${errors.name
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                   : 'border-neutral-200 focus:border-[zinc-900] focus:ring-teal-100'
-              } focus:ring-4 outline-none`}
+                } focus:ring-4 outline-none`}
             />
             <AnimatePresence>
               {errors.name && (
@@ -220,13 +219,12 @@ export const ClothingUpload = ({ onUploadComplete }: ClothingUploadProps) => {
                 onDrop={handleDrop}
               >
                 <label
-                  className={`flex flex-col items-center justify-center w-full h-80 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-                    dragActive
+                  className={`flex flex-col items-center justify-center w-full h-80 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${dragActive
                       ? 'border-[zinc-900] bg-zinc-900/10'
                       : errors.file
-                      ? 'border-red-300 bg-red-50'
-                      : 'border-neutral-300 hover:border-zinc-900 hover:bg-zinc-900/5'
-                  }`}
+                        ? 'border-red-300 bg-red-50'
+                        : 'border-neutral-300 hover:border-zinc-900 hover:bg-zinc-900/5'
+                    }`}
                 >
                   <motion.div
                     className="flex flex-col items-center"

@@ -1,18 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
-
-interface Profile {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role?: 'user' | 'admin';
-}
+import type { UserProfile } from '../types';
 
 interface AuthContextType {
   user: User | null;
-  profile: Profile | null;
+  profile: UserProfile | null;
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: Error | null }>;
@@ -24,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -58,22 +51,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function loadProfile(userId: string) {
     try {
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
       if (error) throw error;
 
-      // Map user_profiles data to Profile format
+      // Set profile data
       if (data) {
-        setProfile({
-          id: data.id,
-          first_name: data.first_name || '',
-          last_name: data.last_name || '',
-          email: '', // Will be filled from auth user
-          role: data.role,
-        });
+        setProfile(data as UserProfile);
       }
     } catch (error) {
       console.error('Error loading profile:', error);

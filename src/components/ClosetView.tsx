@@ -23,6 +23,7 @@ const categories: { value: ClothingCategory | 'all'; label: string }[] = [
   { value: 'Camperas', label: 'Camperas' },
   { value: 'Accesorios', label: 'Accesorios' },
   { value: 'Zapatos', label: 'Zapatos' },
+  { value: 'Otros', label: 'Otros' },
 ];
 
 export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }: ClosetViewProps) => {
@@ -149,26 +150,25 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
                 <ChevronRight className="w-5 h-5 text-neutral-700" />
               </button>
             )}
-          <div ref={scrollContainerRef} className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat.value;
-              return (
-                <motion.button
-                  key={cat.value}
-                  onClick={() => setSelectedCategory(cat.value)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                    isSelected
-                      ? 'bg-zinc-900 text-white shadow-lg'
-                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span>{cat.label}</span>
-                </motion.button>
-              );
-            })}
-          </div>
+            <div ref={scrollContainerRef} className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+              {categories.map((cat) => {
+                const isSelected = selectedCategory === cat.value;
+                return (
+                  <motion.button
+                    key={cat.value}
+                    onClick={() => setSelectedCategory(cat.value)}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${isSelected
+                        ? 'bg-zinc-900 text-white shadow-lg'
+                        : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                      }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span>{cat.label}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
 
           {filteredItems.length === 0 ? (
@@ -184,8 +184,8 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
                 {searchQuery
                   ? 'No se encontraron prendas'
                   : selectedCategory === 'all'
-                  ? 'Tu closet está vacío'
-                  : 'No hay prendas en esta categoría'}
+                    ? 'Tu closet está vacío'
+                    : 'No hay prendas en esta categoría'}
               </h3>
               <p className="text-neutral-500 mb-8">
                 {searchQuery
@@ -206,109 +206,108 @@ export const ClosetView = ({ onItemSelect, selectedItems = [], onAddItemClick }:
             </motion.div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filteredItems.map((item) => {
-                  const isSelected = selectedItems.includes(item.id);
-                  const isDeleting = deleteConfirm === item.id;
-                  return (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={!isSelected ? { y: -5, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } } : {}}
-                      className={`group relative rounded-2xl overflow-hidden bg-white border-2 ${
-                        isSelected
-                          ? 'border-zinc-900 shadow-[0_8px_16px_rgba(24,24,27,0.3)]'
-                          : 'border-[#e2e8f0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
+              {filteredItems.map((item) => {
+                const isSelected = selectedItems.includes(item.id);
+                const isDeleting = deleteConfirm === item.id;
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={!isSelected ? { y: -5, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } } : {}}
+                    className={`group relative rounded-2xl overflow-hidden bg-white border-2 ${isSelected
+                        ? 'border-zinc-900 shadow-[0_8px_16px_rgba(24,24,27,0.3)]'
+                        : 'border-[#e2e8f0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
                       } ${onItemSelect ? 'cursor-pointer' : ''}`}
-                      style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
-                      onClick={() => onItemSelect?.(item)}
-                    >
-                      <div className="aspect-square bg-neutral-50 overflow-hidden">
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                    style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                    onClick={() => onItemSelect?.(item)}
+                  >
+                    <div className="aspect-square bg-neutral-50 overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                      <div className="p-3 bg-white">
-                        <p className="text-sm font-medium text-neutral-900 truncate">
-                          {item.name}
-                        </p>
-                        <p className="text-xs text-neutral-500">
-                          {categories.find((c) => c.value === item.category)?.label}
-                        </p>
-                      </div>
+                    <div className="p-3 bg-white">
+                      <p className="text-sm font-medium text-neutral-900 truncate">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-neutral-500">
+                        {categories.find((c) => c.value === item.category)?.label}
+                      </p>
+                    </div>
 
-                      {!onItemSelect && (
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {!isDeleting ? (
+                    {!onItemSelect && (
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!isDeleting ? (
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirm(item.id);
+                            }}
+                            className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </motion.button>
+                        ) : (
+                          <div className="flex gap-1">
                             <motion.button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setDeleteConfirm(item.id);
+                                deleteItem(item.id);
                               }}
-                              className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
+                              className="p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors text-xs font-medium"
+                              whileHover={{ scale: 1.05 }}
                             >
-                              <Trash2 className="w-4 h-4 text-red-600" />
+                              ✓
                             </motion.button>
-                          ) : (
-                            <div className="flex gap-1">
-                              <motion.button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteItem(item.id);
-                                }}
-                                className="p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors text-xs font-medium"
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                ✓
-                              </motion.button>
-                              <motion.button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteConfirm(null);
-                                }}
-                                className="p-2 bg-neutral-500 text-white rounded-full shadow-lg hover:bg-neutral-600 transition-colors text-xs font-medium"
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                ✕
-                              </motion.button>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                            <motion.button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirm(null);
+                              }}
+                              className="p-2 bg-neutral-500 text-white rounded-full shadow-lg hover:bg-neutral-600 transition-colors text-xs font-medium"
+                              whileHover={{ scale: 1.05 }}
+                            >
+                              ✕
+                            </motion.button>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                      {onItemSelect && (
-                        <motion.div
-                          className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10"
-                          animate={{
-                            scale: isSelected ? 1.1 : 1,
-                            background: isSelected ? '#18181b' : '#ffffff',
-                            borderColor: isSelected ? '#18181b' : '#e2e8f0',
-                            boxShadow: isSelected
-                              ? '0 4px 12px rgba(24, 24, 27, 0.4)'
-                              : '0 2px 8px rgba(0,0,0,0.15)',
-                          }}
-                          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                    {onItemSelect && (
+                      <motion.div
+                        className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                        animate={{
+                          scale: isSelected ? 1.1 : 1,
+                          background: isSelected ? '#18181b' : '#ffffff',
+                          borderColor: isSelected ? '#18181b' : '#e2e8f0',
+                          boxShadow: isSelected
+                            ? '0 4px 12px rgba(24, 24, 27, 0.4)'
+                            : '0 2px 8px rgba(0,0,0,0.15)',
+                        }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                        style={{
+                          border: '2px solid',
+                        }}
+                      >
+                        <Check
+                          className="w-4 h-4"
                           style={{
-                            border: '2px solid',
+                            color: isSelected ? '#ffffff' : '#cbd5e1',
+                            transition: 'color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           }}
-                        >
-                          <Check
-                            className="w-4 h-4"
-                            style={{
-                              color: isSelected ? '#ffffff' : '#cbd5e1',
-                              transition: 'color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            }}
-                          />
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  );
-                })}
+                        />
+                      </motion.div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
