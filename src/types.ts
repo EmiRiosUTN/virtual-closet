@@ -98,9 +98,9 @@ export interface ChatMessage {
   created_at: string;
 }
 
-export interface ChatLimit {
+export interface UsageLimit {
   user_id: string;
-  message_count: number;
-  reset_at: string;
+  chat_message_count: number;
+  outfit_generation_count: number;
   updated_at: string;
 }
