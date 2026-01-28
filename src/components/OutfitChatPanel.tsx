@@ -14,13 +14,20 @@ interface OutfitChatPanelProps {
     onClose: () => void;
 }
 
+type LocalChatMessage = ChatMessage | {
+    id: string;
+    role: 'system';
+    content: string;
+    created_at: string;
+};
+
 export function OutfitChatPanel({
     tryOn,
     userPhotoUrl,
     clothingPhotosUrls,
     onClose,
 }: OutfitChatPanelProps) {
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [messages, setMessages] = useState<LocalChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [initializing, setInitializing] = useState(true);
@@ -53,9 +60,9 @@ export function OutfitChatPanel({
             setMessages(existingMessages);
 
             // Load chat limit
-            const limit = await storageService.getChatLimit();
+            const limit = await storageService.getUsageLimits();
             if (limit) {
-                const remaining = 15 - limit.message_count;
+                const remaining = 15 - limit.chat_message_count;
                 setChatLimit({ remaining: Math.max(0, remaining), allowed: remaining > 0 });
             }
         } catch (err) {
@@ -74,8 +81,17 @@ export function OutfitChatPanel({
         // Check chat limit
         const limitCheck = await storageService.checkAndIncrementChatLimit();
         if (!limitCheck.allowed) {
-            showError('Has alcanzado el límite de 15 mensajes por día. Vuelve mañana.');
+            showError('Has alcanzado el límite de 15 mensajes en total.');
             setChatLimit({ remaining: 0, allowed: false });
+
+            // Add system warning message locally
+            const systemMessage: LocalChatMessage = {
+                id: crypto.randomUUID(),
+                role: 'system',
+                content: '🛑 Has alcanzado el límite de 15 mensajes. No puedes enviar más consultas.',
+                created_at: new Date().toISOString(),
+            };
+            setMessages((prev) => [...prev, systemMessage]);
             return;
         }
 
@@ -101,10 +117,12 @@ export function OutfitChatPanel({
             const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
             const chatService = createGeminiChatService(apiKey);
 
-            const conversationHistory = messages.map((msg) => ({
-                role: msg.role,
-                content: msg.content,
-            }));
+            const conversationHistory = messages
+                .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+                .map((msg) => ({
+                    role: msg.role as 'user' | 'assistant',
+                    content: msg.content,
+                }));
 
             const response = await chatService.sendChatMessage(
                 userInput,
@@ -164,7 +182,7 @@ export function OutfitChatPanel({
                         <div>
                             <h3 className="font-semibold text-gray-900">Asistente de Moda IA</h3>
                             <p className="text-xs text-gray-500">
-                                {chatLimit.remaining} mensajes restantes hoy
+                                {chatLimit.remaining} mensajes restantes
                             </p>
                         </div>
                     </div>
@@ -213,8 +231,10 @@ export function OutfitChatPanel({
                                 >
                                     <div
                                         className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.role === 'user'
-                                            ? 'bg-black text-white'
-                                            : 'bg-gradient-to-br from-purple-50 to-pink-50 text-gray-900 border border-purple-100'
+                                                ? 'bg-black text-white'
+                                                : message.role === 'system'
+                                                    ? 'bg-red-50 text-red-700 border border-red-200'
+                                                    : 'bg-gradient-to-br from-purple-50 to-pink-50 text-gray-900 border border-purple-100'
                                             }`}
                                     >
                                         {message.role === 'assistant' ? (
@@ -222,10 +242,14 @@ export function OutfitChatPanel({
                                                 <ReactMarkdown>{message.content}</ReactMarkdown>
                                             </div>
                                         ) : (
-                                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                            <p className={`text-sm whitespace-pre-wrap ${message.role === 'system' ? 'font-medium' : ''}`}>
+                                                {message.content}
+                                            </p>
                                         )}
                                         <p
-                                            className={`text-xs mt-2 ${message.role === 'user' ? 'text-gray-300' : 'text-gray-500'
+                                            className={`text-xs mt-2 ${message.role === 'user' ? 'text-gray-300'
+                                                    : message.role === 'system' ? 'text-red-400'
+                                                        : 'text-gray-500'
                                                 }`}
                                         >
                                             {new Date(message.created_at).toLocaleTimeString('es-ES', {
@@ -265,14 +289,14 @@ export function OutfitChatPanel({
                             placeholder={
                                 chatLimit.allowed
                                     ? 'Escribe tu pregunta...'
-                                    : 'Límite alcanzado por hoy'
+                                    : 'Has usado todos tus mensajes'
                             }
-                            disabled={loading || !chatLimit.allowed}
+                            disabled={loading}
                             className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all text-sm disabled:bg-gray-50 disabled:cursor-not-allowed"
                         />
                         <button
                             onClick={handleSendMessage}
-                            disabled={loading || !input.trim() || !chatLimit.allowed}
+                            disabled={loading || !input.trim()}
                             className="px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/30"
                         >
                             <Send className="w-5 h-5" />

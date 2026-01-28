@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { ClothingItem, UserPhoto, Outfit, VirtualTryOnResult, SavedTryOn, UserProfile, ChatMessage, ChatLimit } from '../types';
+import { ClothingItem, UserPhoto, Outfit, VirtualTryOnResult, SavedTryOn, UserProfile, ChatMessage, UsageLimit } from '../types';
 
 async function getCurrentUserId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -432,96 +432,111 @@ export const storageService = {
     }
   },
 
-  async getChatLimit(): Promise<ChatLimit | null> {
+  async getUsageLimits(): Promise<UsageLimit | null> {
     const userId = await getCurrentUserId();
-    const { data, error } = await supabase
-      .from('user_chat_limits')
+    const { data } = await supabase
+      .from('user_usage_limits')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching chat limit:', error);
-      return null;
-    }
 
     return data;
   },
 
   async checkAndIncrementChatLimit(): Promise<{ allowed: boolean; remaining: number }> {
     const userId = await getCurrentUserId();
-    const now = new Date();
+    const LIMIT = 15;
 
-    // Get or create chat limit record
-    let { data: limit, error } = await supabase
-      .from('user_chat_limits')
+    let { data: usage } = await supabase
+      .from('user_usage_limits')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
-    if (error) {
-      console.error('Error fetching chat limit:', error);
-      return { allowed: false, remaining: 0 };
-    }
-
-    // If no record exists, create one
-    if (!limit) {
-      const { error: insertError } = await supabase
-        .from('user_chat_limits')
+    if (!usage) {
+      const { data: newUsage, error } = await supabase
+        .from('user_usage_limits')
         .insert({
           user_id: userId,
-          message_count: 1,
-          reset_at: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
-        });
-
-      if (insertError) {
-        console.error('Error creating chat limit:', insertError);
-        return { allowed: false, remaining: 0 };
-      }
-
-      return { allowed: true, remaining: 14 };
-    }
-
-    // Check if we need to reset
-    const resetAt = new Date(limit.reset_at);
-    if (now >= resetAt) {
-      const { error: updateError } = await supabase
-        .from('user_chat_limits')
-        .update({
-          message_count: 1,
-          reset_at: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: now.toISOString(),
+          chat_message_count: 1,
+          outfit_generation_count: 0
         })
-        .eq('user_id', userId);
+        .select()
+        .single();
 
-      if (updateError) {
-        console.error('Error resetting chat limit:', updateError);
+      if (error) {
+        console.error('Error creating usage limit:', error);
         return { allowed: false, remaining: 0 };
       }
-
-      return { allowed: true, remaining: 14 };
+      return { allowed: true, remaining: LIMIT - 1 };
     }
 
-    // Check if limit exceeded
-    if (limit.message_count >= 15) {
+    if (usage.chat_message_count >= LIMIT) {
       return { allowed: false, remaining: 0 };
     }
 
-    // Increment count
-    const { error: updateError } = await supabase
-      .from('user_chat_limits')
+    const { error } = await supabase
+      .from('user_usage_limits')
       .update({
-        message_count: limit.message_count + 1,
-        updated_at: now.toISOString(),
+        chat_message_count: usage.chat_message_count + 1,
+        updated_at: new Date().toISOString()
       })
       .eq('user_id', userId);
 
-    if (updateError) {
-      console.error('Error incrementing chat limit:', updateError);
+    if (error) {
+      console.error('Error incrementing chat limit:', error);
       return { allowed: false, remaining: 0 };
     }
 
-    return { allowed: true, remaining: 15 - (limit.message_count + 1) };
+    return { allowed: true, remaining: LIMIT - (usage.chat_message_count + 1) };
+  },
+
+  async checkAndIncrementOutfitLimit(): Promise<{ allowed: boolean; remaining: number }> {
+    const userId = await getCurrentUserId();
+    const LIMIT = 10;
+
+    let { data: usage } = await supabase
+      .from('user_usage_limits')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (!usage) {
+      const { data: newUsage, error } = await supabase
+        .from('user_usage_limits')
+        .insert({
+          user_id: userId,
+          chat_message_count: 0,
+          outfit_generation_count: 1
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating usage limit:', error);
+        return { allowed: false, remaining: 0 };
+      }
+      return { allowed: true, remaining: LIMIT - 1 };
+    }
+
+    if (usage.outfit_generation_count >= LIMIT) {
+      return { allowed: false, remaining: 0 };
+    }
+
+    const { error } = await supabase
+      .from('user_usage_limits')
+      .update({
+        outfit_generation_count: usage.outfit_generation_count + 1,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error incrementing outfit limit:', error);
+      return { allowed: false, remaining: 0 };
+    }
+
+    return { allowed: true, remaining: LIMIT - (usage.outfit_generation_count + 1) };
   },
 
   async completeOnboarding(

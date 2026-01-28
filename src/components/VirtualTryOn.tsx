@@ -118,6 +118,13 @@ export const VirtualTryOn = ({ onNavigateToGallery }: VirtualTryOnProps = {}) =>
       return;
     }
 
+    // Check limit
+    const limitCheck = await storageService.checkAndIncrementOutfitLimit();
+    if (!limitCheck.allowed) {
+      setError('Has alcanzado el límite de 10 generaciones de outfits en total.');
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
     setResultImage(null);
