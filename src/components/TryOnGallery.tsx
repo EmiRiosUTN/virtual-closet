@@ -7,7 +7,12 @@ import { storageService } from '../services/storage';
 import { useToast } from '../hooks/useToast';
 import { OutfitChatPanel } from './OutfitChatPanel';
 
-export const TryOnGallery = () => {
+interface TryOnGalleryProps {
+  autoOpenImageUrl?: string | null;
+  onAutoOpenComplete?: () => void;
+}
+
+export const TryOnGallery = ({ autoOpenImageUrl, onAutoOpenComplete }: TryOnGalleryProps = {}) => {
   const [savedTryOns, setSavedTryOns] = useState<SavedTryOn[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<SavedTryOn | null>(null);
@@ -29,6 +34,16 @@ export const TryOnGallery = () => {
     const tryOns = await storageService.getSavedTryOns();
     setSavedTryOns(tryOns);
     setIsLoading(false);
+
+    if (autoOpenImageUrl) {
+      const tryOnToOpen = tryOns.find(t => t.result_image_url === autoOpenImageUrl);
+      if (tryOnToOpen) {
+        setSelectedImage(tryOnToOpen);
+        if (onAutoOpenComplete) {
+          onAutoOpenComplete();
+        }
+      }
+    }
   };
 
   const handleDeleteClick = (id: string, e: React.MouseEvent) => {
@@ -225,13 +240,22 @@ export const TryOnGallery = () => {
                         minute: '2-digit',
                       })}
                     </p>
-                    <button
-                      onClick={(e) => handleDeleteClick(selectedImage.id, e)}
-                      className="mt-4 flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Eliminar
-                    </button>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <button
+                        onClick={(e) => handleChatClick(selectedImage, e)}
+                        className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors font-medium text-sm"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Chat IA
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteClick(selectedImage.id, e)}
+                        className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Eliminar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>

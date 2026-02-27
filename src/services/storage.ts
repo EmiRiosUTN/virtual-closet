@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { ClothingItem, UserPhoto, Outfit, VirtualTryOnResult, SavedTryOn, UserProfile, ChatMessage, UsageLimit } from '../types';
+import { ClothingItem, UserPhoto, Outfit, OutfitFolder, VirtualTryOnResult, SavedTryOn, UserProfile, ChatMessage, UsageLimit } from '../types';
 
 async function getCurrentUserId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -48,6 +48,12 @@ export const storageService = {
       name: item.name,
       category: item.category,
       imageUrl: item.image_url,
+      telas: item.telas || [],
+      colores: item.colores || [],
+      tipos_vestido: item.tipos_vestido || [],
+      tipos_pantalon: item.tipos_pantalon || [],
+      tipos_zapatos: item.tipos_zapatos || [],
+      isWishlist: item.is_wishlist || false,
       createdAt: new Date(item.created_at).getTime(),
     }));
   },
@@ -63,12 +69,18 @@ export const storageService = {
 
     const { error } = await supabase
       .from('clothing_items')
-      .insert({
+      .upsert({
         id: item.id,
         name: item.name,
         category: item.category,
         image_url: imageUrl,
         user_id: userId,
+        telas: item.telas || [],
+        colores: item.colores || [],
+        tipos_vestido: item.tipos_vestido || [],
+        tipos_pantalon: item.tipos_pantalon || [],
+        tipos_zapatos: item.tipos_zapatos || [],
+        is_wishlist: item.isWishlist || false,
       });
 
     if (error) {
@@ -166,6 +178,72 @@ export const storageService = {
     }
   },
 
+  async getOutfitFolders(): Promise<OutfitFolder[]> {
+    const { data, error } = await supabase
+      .from('outfit_folders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching outfit folders:', error);
+      return [];
+    }
+
+    return data.map(folder => ({
+      id: folder.id,
+      name: folder.name,
+      createdAt: new Date(folder.created_at).getTime(),
+    }));
+  },
+
+  async saveOutfitFolder(folder: OutfitFolder): Promise<void> {
+    const userId = await getCurrentUserId();
+    const existing = await supabase
+      .from('outfit_folders')
+      .select('id')
+      .eq('id', folder.id)
+      .maybeSingle();
+
+    if (existing.data) {
+      const { error } = await supabase
+        .from('outfit_folders')
+        .update({
+          name: folder.name,
+        })
+        .eq('id', folder.id);
+
+      if (error) {
+        console.error('Error updating outfit folder:', error);
+        throw error;
+      }
+    } else {
+      const { error } = await supabase
+        .from('outfit_folders')
+        .insert({
+          id: folder.id,
+          name: folder.name,
+          user_id: userId,
+        });
+
+      if (error) {
+        console.error('Error saving outfit folder:', error);
+        throw error;
+      }
+    }
+  },
+
+  async deleteOutfitFolder(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('outfit_folders')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting outfit folder:', error);
+      throw error;
+    }
+  },
+
   async getOutfits(): Promise<Outfit[]> {
     const { data, error } = await supabase
       .from('outfits')
@@ -181,6 +259,7 @@ export const storageService = {
       id: outfit.id,
       name: outfit.name,
       items: outfit.clothing_item_ids || [],
+      folder: outfit.folder,
       createdAt: new Date(outfit.created_at).getTime(),
     }));
   },
@@ -199,6 +278,7 @@ export const storageService = {
         .update({
           name: outfit.name,
           clothing_item_ids: outfit.items,
+          folder: outfit.folder || null,
         })
         .eq('id', outfit.id);
 
@@ -213,6 +293,7 @@ export const storageService = {
           id: outfit.id,
           name: outfit.name,
           clothing_item_ids: outfit.items,
+          folder: outfit.folder || null,
           user_id: userId,
         });
 
@@ -466,7 +547,9 @@ export const storageService = {
 
       if (error) {
         console.error('Error creating usage limit:', error);
-        return { allowed: false, remaining: 0 };
+        // Fail open: Allow the user to proceed even if we couldn't track it, 
+        // to prevent blocking legitimate users due to database/network errors.
+        return { allowed: true, remaining: LIMIT - 1 };
       }
       return { allowed: true, remaining: LIMIT - 1 };
     }
@@ -495,6 +578,8 @@ export const storageService = {
     const userId = await getCurrentUserId();
     const LIMIT = 10;
 
+    console.log(`Checking outfit limit for user: ${userId}`);
+
     let { data: usage } = await supabase
       .from('user_usage_limits')
       .select('*')
@@ -514,7 +599,8 @@ export const storageService = {
 
       if (error) {
         console.error('Error creating usage limit:', error);
-        return { allowed: false, remaining: 0 };
+        // Fail open: Allow the user to proceed even if we couldn't track it
+        return { allowed: true, remaining: LIMIT - 1 };
       }
       return { allowed: true, remaining: LIMIT - 1 };
     }
@@ -588,6 +674,7 @@ export const storageService = {
       supabase.from('clothing_items').delete().neq('id', ''),
       supabase.from('user_photos').delete().neq('id', ''),
       supabase.from('outfits').delete().neq('id', ''),
+      supabase.from('outfit_folders').delete().neq('id', ''),
       supabase.from('try_on_results').delete().neq('id', ''),
     ]);
   },

@@ -6,8 +6,8 @@ export type ClothingCategory =
   | 'Polleras'
   | 'Shorts'
   | 'Vestidos'
-  | 'Chalecos'
-  | 'Camperas'
+  | 'Chalecos y blazers'
+  | 'Abrigos y camperas'
   | 'Accesorios'
   | 'Zapatos'
   | 'Otros';
@@ -17,6 +17,12 @@ export interface ClothingItem {
   category: ClothingCategory;
   imageUrl: string;
   name: string;
+  telas?: string[];
+  colores?: string[];
+  tipos_vestido?: string[];
+  tipos_pantalon?: string[];
+  tipos_zapatos?: string[];
+  isWishlist?: boolean;
   createdAt: number;
 }
 
@@ -27,12 +33,19 @@ export interface UserPhoto {
   createdAt: number;
 }
 
+export interface OutfitFolder {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
 export interface Outfit {
   id: string;
   name: string;
   items: string[];
   createdAt: number;
   imageUrl?: string;
+  folder?: string;
 }
 
 export interface VirtualTryOnRequest {

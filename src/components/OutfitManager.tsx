@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Heart, Trash2, Plus, X, Save, Sparkles } from 'lucide-react';
+import { Heart, Trash2, Plus, X, Save, Sparkles, Folder, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Outfit, ClothingItem } from '../types';
+import { Outfit, ClothingItem, OutfitFolder } from '../types';
 import { storageService } from '../services/storage';
 import { ClosetView } from './ClosetView';
 import { OutfitModal } from './OutfitModal';
 import { useToast } from '../hooks/useToast';
+import { PageHeader } from './PageHeader';
 
 export const OutfitManager = () => {
   const [outfits, setOutfits] = useState<Outfit[]>([]);
@@ -14,14 +15,26 @@ export const OutfitManager = () => {
   const [outfitName, setOutfitName] = useState('');
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [nameError, setNameError] = useState('');
+  const [deleteFolderConfirm, setDeleteFolderConfirm] = useState<string | null>(null);
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
+  const [nameError, setNameError] = useState('');
+  const [outfitFolder, setOutfitFolder] = useState('');
+  const [selectedFilterFolder, setSelectedFilterFolder] = useState<string | null>(null);
+  const [folders, setFolders] = useState<OutfitFolder[]>([]);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
   const { warning } = useToast();
 
   useEffect(() => {
     loadOutfits();
     loadClothingItems();
+    loadFolders();
   }, []);
+
+  const loadFolders = async () => {
+    const fetchedFolders = await storageService.getOutfitFolders();
+    setFolders(fetchedFolders);
+  };
 
   const loadOutfits = async () => {
     const savedOutfits = await storageService.getOutfits();
@@ -83,11 +96,13 @@ export const OutfitManager = () => {
       id: crypto.randomUUID(),
       name: outfitName.trim(),
       items: selectedItems.map((item) => item.id),
+      folder: outfitFolder.trim() || undefined,
       createdAt: Date.now(),
     };
 
     await storageService.saveOutfit(newOutfit);
     setOutfitName('');
+    setOutfitFolder('');
     setSelectedItems([]);
     setIsCreating(false);
     setNameError('');
@@ -110,8 +125,33 @@ export const OutfitManager = () => {
     setIsCreating(false);
     setSelectedItems([]);
     setOutfitName('');
+    setOutfitFolder('');
     setNameError('');
   };
+
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) return;
+    const newFolder = {
+      id: crypto.randomUUID(),
+      name: newFolderName.trim(),
+      createdAt: Date.now()
+    };
+    await storageService.saveOutfitFolder(newFolder);
+    setOutfitFolder(newFolder.name); // Auto-select it for the outfit being created
+    setNewFolderName('');
+    setIsCreatingFolder(false);
+    await loadFolders();
+  };
+
+  const handleDeleteFolder = async (id: string) => {
+    await storageService.deleteOutfitFolder(id);
+    await loadFolders();
+    setDeleteFolderConfirm(null);
+  };
+
+  const filteredOutfits = selectedFilterFolder
+    ? outfits.filter(o => o.folder === selectedFilterFolder)
+    : outfits.filter(o => !o.folder); // Solo outfits sueltos en la raíz
 
   return (
     <motion.div
@@ -119,31 +159,51 @@ export const OutfitManager = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div className="bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden">
-        <div className="bg-zinc-900 px-6 sm:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <PageHeader
+        title="Mis Outfits"
+        description={`${outfits.length} ${outfits.length === 1 ? 'outfit' : 'outfits'} guardados`}
+        icon={Heart}
+        action={
+          !isCreating ? (
             <div className="flex items-center gap-3">
-              <Heart className="w-7 h-7 text-white" />
-              <div>
-                <h2 className="text-2xl font-semibold text-white">Mis Outfits</h2>
-                <p className="text-white/80 text-sm">
-                  {outfits.length} {outfits.length === 1 ? 'outfit' : 'outfits'} guardados
-                </p>
-              </div>
-            </div>
-            {!isCreating && (
               <motion.button
-                onClick={() => setIsCreating(true)}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[zinc-900] rounded-xl font-semibold hover:bg-neutral-100 transition-all shadow-lg"
+                onClick={() => setIsCreatingFolder(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-zinc-900 rounded-xl font-medium shadow-sm border border-neutral-200 hover:bg-neutral-50 transition-all text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Plus className="w-5 h-5" />
+                + Carpeta
+              </motion.button>
+              <motion.button
+                onClick={() => setIsCreating(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-xl font-semibold shadow-md hover:bg-zinc-800 transition-all text-sm"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Plus className="w-4 h-4" />
                 Crear Outfit
               </motion.button>
-            )}
+            </div>
+          ) : undefined
+        }
+      />
+
+      <div className="bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden">
+        {selectedFilterFolder && !isCreating && (
+          <div className="px-6 sm:px-8 py-4 bg-neutral-50/50 border-b border-neutral-100 flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
+              <Folder className="w-5 h-5 text-neutral-400 fill-neutral-200" />
+              {selectedFilterFolder}
+            </h3>
+            <button
+              onClick={() => setSelectedFilterFolder(null)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 text-neutral-700 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver a todas las carpetas
+            </button>
           </div>
-        </div>
+        )}
 
         <div className="p-6 sm:p-8">
           <AnimatePresence>
@@ -182,11 +242,10 @@ export const OutfitManager = () => {
                       }}
                       onBlur={validateName}
                       placeholder="Ej: Look casual de viernes"
-                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${
-                        nameError
-                          ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                          : 'border-white focus:border-[zinc-900] focus:ring-teal-100'
-                      } focus:ring-4 outline-none bg-white`}
+                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${nameError
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                        : 'border-white focus:border-[zinc-900] focus:ring-teal-100'
+                        } focus:ring-4 outline-none bg-white`}
                     />
                     <AnimatePresence>
                       {nameError && (
@@ -200,6 +259,33 @@ export const OutfitManager = () => {
                         </motion.p>
                       )}
                     </AnimatePresence>
+                  </div>
+
+                  <div>
+                    <label htmlFor="outfitFolder" className="block text-sm font-medium text-neutral-700 mb-2">
+                      Carpeta / Estilo (Opcional)
+                    </label>
+                    <select
+                      id="outfitFolder"
+                      value={outfitFolder}
+                      onChange={(e) => {
+                        if (e.target.value === 'CREATE_NEW_FOLDER') {
+                          setIsCreatingFolder(true);
+                        } else {
+                          setOutfitFolder(e.target.value);
+                        }
+                      }}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-white focus:border-[zinc-900] focus:ring-4 focus:ring-teal-100 outline-none bg-white transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="">Sin Carpeta</option>
+                      {folders.map(f => (
+                        <option key={f.id} value={f.name}>{f.name}</option>
+                      ))}
+                      <option disabled>──────────</option>
+                      <option value="CREATE_NEW_FOLDER" className="font-semibold text-zinc-900">
+                        + Crear nueva carpeta...
+                      </option>
+                    </select>
                   </div>
 
                   <div>
@@ -238,7 +324,7 @@ export const OutfitManager = () => {
             )}
           </AnimatePresence>
 
-          {outfits.length === 0 ? (
+          {outfits.length === 0 && folders.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -248,10 +334,10 @@ export const OutfitManager = () => {
                 <Heart className="w-10 h-10 text-white" />
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">
-                No has creado outfits aún
+                No has creado outfits ni carpetas aún
               </h3>
               <p className="text-neutral-500 mb-8">
-                ¡Comienza combinando tus prendas favoritas!
+                ¡Comienza organizando o combinando tus prendas favoritas!
               </p>
               <motion.button
                 onClick={() => setIsCreating(true)}
@@ -265,116 +351,234 @@ export const OutfitManager = () => {
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {outfits.map((outfit) => {
-                  const items = getItemsForOutfit(outfit);
-                  const isDeleting = deleteConfirm === outfit.id;
-                  return (
-                    <motion.div
-                      key={outfit.id}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.2 }}
-                      whileHover={{ y: -8 }}
-                      className="group bg-white border-2 border-neutral-200 rounded-2xl overflow-hidden hover:border-[zinc-900]/30 hover:shadow-xl transition-all cursor-pointer"
-                      onClick={() => setSelectedOutfit(outfit)}
-                    >
-                      <div className="relative aspect-square bg-neutral-100 p-3">
-                        {items.length === 0 ? (
-                          <div className="h-full flex items-center justify-center">
-                            <div className="text-center">
-                              <Sparkles className="w-12 h-12 text-neutral-300 mx-auto mb-2" />
-                              <p className="text-xs text-neutral-400">{outfit.items.length} items</p>
-                            </div>
+
+              {/* Folder Cards (Only at root level) */}
+              {!selectedFilterFolder && folders.map(folder => {
+                const folderOutfitsCount = outfits.filter(o => o.folder === folder.name).length;
+                const isDeletingFolder = deleteFolderConfirm === folder.id;
+
+                return (
+                  <motion.div
+                    key={`folder-${folder.id}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -8 }}
+                    onClick={() => setSelectedFilterFolder(folder.name)}
+                    className="group bg-neutral-100 border-2 border-neutral-200 rounded-2xl overflow-hidden hover:border-zinc-900/30 hover:shadow-xl transition-all cursor-pointer flex flex-col relative aspect-square"
+                  >
+                    <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center">
+                      <Folder className="w-20 h-20 text-zinc-900 fill-zinc-900/10 mb-4 transition-transform group-hover:scale-110" />
+                      <h4 className="font-bold text-xl text-zinc-900 mb-2">{folder.name}</h4>
+                      <p className="text-sm font-medium text-neutral-500 bg-white px-3 py-1 rounded-full shadow-sm">
+                        {folderOutfitsCount} {folderOutfitsCount === 1 ? 'outfit' : 'outfits'}
+                      </p>
+                    </div>
+
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                      {!isDeletingFolder ? (
+                        <motion.button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteFolderConfirm(folder.id);
+                          }}
+                          className="p-2.5 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </motion.button>
+                      ) : (
+                        <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteFolder(folder.id);
+                            }}
+                            className="p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors text-xs font-medium"
+                            whileHover={{ scale: 1.05 }}
+                          >
+                            ✓
+                          </motion.button>
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteFolderConfirm(null);
+                            }}
+                            className="p-2 bg-neutral-500 text-white rounded-full shadow-lg hover:bg-neutral-600 transition-colors text-xs font-medium"
+                            whileHover={{ scale: 1.05 }}
+                          >
+                            ✕
+                          </motion.button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+              {filteredOutfits.map((outfit) => {
+                const items = getItemsForOutfit(outfit);
+                const isDeleting = deleteConfirm === outfit.id;
+                return (
+                  <motion.div
+                    key={outfit.id}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                    whileHover={{ y: -8 }}
+                    className="group bg-white border-2 border-neutral-200 rounded-2xl overflow-hidden hover:border-[zinc-900]/30 hover:shadow-xl transition-all cursor-pointer flex flex-col"
+                    onClick={() => setSelectedOutfit(outfit)}
+                  >
+                    <div className="relative aspect-square bg-neutral-100 p-3 flex-shrink-0">
+                      {items.length === 0 ? (
+                        <div className="h-full flex items-center justify-center">
+                          <div className="text-center">
+                            <Sparkles className="w-12 h-12 text-neutral-300 mx-auto mb-2" />
+                            <p className="text-xs text-neutral-400">{outfit.items.length} items</p>
                           </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-2 h-full">
-                            {items.slice(0, 4).map((item, index) => (
-                              <div
-                                key={item.id}
-                                className={`rounded-xl overflow-hidden bg-white shadow-sm ${
-                                  items.length === 1 ? 'col-span-2 row-span-2' : ''
-                                } ${
-                                  items.length === 3 && index === 0 ? 'col-span-2' : ''
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-2 h-full">
+                          {items.slice(0, 4).map((item, index) => (
+                            <div
+                              key={item.id}
+                              className={`rounded-xl overflow-hidden bg-white shadow-sm ${items.length === 1 ? 'col-span-2 row-span-2' : ''
+                                } ${items.length === 3 && index === 0 ? 'col-span-2' : ''
                                 }`}
-                              >
-                                <img
-                                  src={item.imageUrl}
-                                  alt={item.name}
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                />
-                              </div>
-                            ))}
-                            {items.length > 4 && (
-                              <div className="bg-zinc-900 flex items-center justify-center rounded-xl shadow-sm">
-                                <span className="text-white font-semibold text-sm">
-                                  +{items.length - 4}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {!isDeleting ? (
-                            <motion.button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteConfirm(outfit.id);
-                              }}
-                              className="p-2.5 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
                             >
-                              <Trash2 className="w-4 h-4 text-red-600" />
-                            </motion.button>
-                          ) : (
-                            <div className="flex gap-1">
-                              <motion.button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteOutfit(outfit.id);
-                                }}
-                                className="p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors text-xs font-medium"
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                ✓
-                              </motion.button>
-                              <motion.button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteConfirm(null);
-                                }}
-                                className="p-2 bg-neutral-500 text-white rounded-full shadow-lg hover:bg-neutral-600 transition-colors text-xs font-medium"
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                ✕
-                              </motion.button>
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                              />
+                            </div>
+                          ))}
+                          {items.length > 4 && (
+                            <div className="bg-zinc-900 flex items-center justify-center rounded-xl shadow-sm">
+                              <span className="text-white font-semibold text-sm">
+                                +{items.length - 4}
+                              </span>
                             </div>
                           )}
                         </div>
-                      </div>
-                      <div className="p-4">
-                        <h4 className="font-semibold text-neutral-900 mb-1 truncate">
-                          {outfit.name}
-                        </h4>
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm text-neutral-500">
-                            {items.length} {items.length === 1 ? 'prenda' : 'prendas'}
-                          </p>
-                          <Heart className="w-4 h-4 text-[zinc-900] fill-[zinc-900]" />
+                      )}
+
+                      {outfit.folder && (
+                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg shadow-sm text-xs font-medium text-zinc-900 z-10">
+                          {outfit.folder}
                         </div>
+                      )}
+
+                      <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        {!isDeleting ? (
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirm(outfit.id);
+                            }}
+                            className="p-2.5 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </motion.button>
+                        ) : (
+                          <div className="flex gap-1">
+                            <motion.button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteOutfit(outfit.id);
+                              }}
+                              className="p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors text-xs font-medium"
+                              whileHover={{ scale: 1.05 }}
+                            >
+                              ✓
+                            </motion.button>
+                            <motion.button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirm(null);
+                              }}
+                              className="p-2 bg-neutral-500 text-white rounded-full shadow-lg hover:bg-neutral-600 transition-colors text-xs font-medium"
+                              whileHover={{ scale: 1.05 }}
+                            >
+                              ✕
+                            </motion.button>
+                          </div>
+                        )}
                       </div>
-                    </motion.div>
-                  );
-                })}
+                    </div>
+                    <div className="p-4 flex flex-col flex-grow justify-between">
+                      <h4 className="font-semibold text-neutral-900 mb-1 truncate">
+                        {outfit.name}
+                      </h4>
+                      <div className="flex items-center justify-between mt-auto">
+                        <p className="text-sm text-neutral-500">
+                          {items.length} {items.length === 1 ? 'prenda' : 'prendas'}
+                        </p>
+                        <Heart className="w-4 h-4 text-[zinc-900] fill-[zinc-900]" />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
 
       <AnimatePresence>
+        {isCreatingFolder && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99] flex items-center justify-center p-4" onClick={() => setIsCreatingFolder(false)}>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm shadow-2xl border-2 border-neutral-100"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-zinc-900">Nueva Carpeta</h3>
+                <button onClick={() => setIsCreatingFolder(false)} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
+                  <X className="w-5 h-5 text-neutral-500" />
+                </button>
+              </div>
+
+              <input
+                autoFocus
+                type="text"
+                value={newFolderName}
+                onChange={e => setNewFolderName(e.target.value)}
+                className="w-full px-4 py-3 bg-neutral-50 border-2 border-neutral-200 rounded-xl mb-6 outline-none focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/10 transition-all font-medium"
+                placeholder="Ej: Invierno, Trabajo..."
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleCreateFolder();
+                }}
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsCreatingFolder(false)}
+                  className="flex-1 py-3 rounded-xl border-2 border-neutral-200 font-semibold text-neutral-600 hover:bg-neutral-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateFolder}
+                  disabled={!newFolderName.trim()}
+                  className="flex-1 py-3 bg-zinc-900 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Crear
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {selectedOutfit && (
           <OutfitModal
             outfit={selectedOutfit}
+            folders={folders}
             onClose={() => setSelectedOutfit(null)}
             onUpdate={() => {
               loadOutfits();

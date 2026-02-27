@@ -73,6 +73,19 @@ export const adminService = {
                 // Don't throw, user is already created in Auth
             }
 
+            // Initialize usage limits
+            const { error: limitsError } = await supabase
+                .from('user_usage_limits')
+                .insert({
+                    user_id: authData.user.id,
+                    chat_message_count: 0,
+                    outfit_generation_count: 0
+                });
+
+            if (limitsError) {
+                console.error('Error creating usage limits:', limitsError);
+            }
+
             return { success: true };
         } catch (error) {
             console.error('Error creating user:', error);

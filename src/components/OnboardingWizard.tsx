@@ -191,7 +191,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 </p>
             </div>
             <div className="max-w-2xl mx-auto">
-                <div className="bg-gray-50 rounded-2xl p-8 space-y-4">
+                <div className="bg-gray-50 rounded-2xl p-4 sm:p-8 space-y-4">
                     <label className="flex items-start gap-4 cursor-pointer group">
                         <input
                             type="checkbox"
@@ -237,18 +237,18 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                             {Array.from({ length: totalSteps }).map((_, index) => (
                                 <div key={index} className="flex items-center">
                                     <div
-                                        className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${index < currentStep
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold transition-all text-sm sm:text-base ${index < currentStep
                                             ? 'bg-purple-500 text-white'
                                             : index === currentStep
                                                 ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg scale-110'
                                                 : 'bg-gray-200 text-gray-400'
                                             }`}
                                     >
-                                        {index < currentStep ? <Check className="w-5 h-5" /> : index + 1}
+                                        {index < currentStep ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : index + 1}
                                     </div>
                                     {index < totalSteps - 1 && (
                                         <div
-                                            className={`w-16 h-1 mx-2 rounded transition-all ${index < currentStep ? 'bg-purple-500' : 'bg-gray-200'
+                                            className={`w-6 sm:w-16 h-1 mx-1 sm:mx-2 rounded transition-all ${index < currentStep ? 'bg-purple-500' : 'bg-gray-200'
                                                 }`}
                                         />
                                     )}
@@ -262,7 +262,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
+                <div className="flex-1 flex items-start md:items-center justify-center p-4 sm:p-8">
                     <div className="w-full max-w-5xl">
                         <AnimatePresence mode="wait">
                             <motion.div

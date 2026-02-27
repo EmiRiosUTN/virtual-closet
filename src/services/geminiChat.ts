@@ -18,7 +18,7 @@ interface GeminiChatResponse {
 
 export class GeminiChatService {
     private apiKey: string;
-    private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+    private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
     constructor(apiKey: string) {
         this.apiKey = apiKey;

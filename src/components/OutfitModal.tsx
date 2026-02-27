@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Edit2, Save, Trash2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Outfit, ClothingItem } from '../types';
+import { Outfit, ClothingItem, OutfitFolder } from '../types';
 import { storageService } from '../services/storage';
 import { ClosetView } from './ClosetView';
 
 interface OutfitModalProps {
   outfit: Outfit;
+  folders: OutfitFolder[];
   onClose: () => void;
   onUpdate: () => void;
 }
 
-export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => {
+export const OutfitModal = ({ outfit, folders, onClose, onUpdate }: OutfitModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [outfitName, setOutfitName] = useState(outfit.name);
+  const [outfitFolder, setOutfitFolder] = useState(outfit.folder || '');
   const [selectedItems, setSelectedItems] = useState<ClothingItem[]>([]);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const [showItemSelector, setShowItemSelector] = useState(false);
@@ -37,6 +39,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
     const updatedOutfit: Outfit = {
       ...outfit,
       name: outfitName.trim(),
+      folder: outfitFolder.trim() || undefined,
       items: selectedItems.map((item) => item.id),
     };
     await storageService.saveOutfit(updatedOutfit);
@@ -75,17 +78,36 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
         <div className="bg-zinc-900 px-6 py-5 flex items-center justify-between">
           <div className="flex-1">
             {isEditing ? (
-              <input
-                type="text"
-                value={outfitName}
-                onChange={(e) => setOutfitName(e.target.value)}
-                className="bg-white/20 text-white placeholder-blue-200 px-4 py-2 rounded-xl border border-white/30 focus:bg-white/30 focus:border-white/50 transition-all outline-none w-full max-w-md"
-                placeholder="Nombre del outfit"
-              />
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={outfitName}
+                  onChange={(e) => setOutfitName(e.target.value)}
+                  className="bg-white/20 text-white placeholder-white/50 px-4 py-2 rounded-xl border border-white/30 focus:bg-white/30 focus:border-white/50 transition-all outline-none w-full max-w-md"
+                  placeholder="Nombre del outfit"
+                />
+                <select
+                  value={outfitFolder}
+                  onChange={(e) => setOutfitFolder(e.target.value)}
+                  className="bg-white/20 text-white px-4 py-2 rounded-xl border border-white/30 focus:bg-white/30 focus:border-white/50 transition-all outline-none w-full max-w-md block text-sm appearance-none cursor-pointer"
+                >
+                  <option value="" className="text-zinc-900">Sin Carpeta</option>
+                  {folders.map(f => (
+                    <option key={f.id} value={f.name} className="text-zinc-900">{f.name}</option>
+                  ))}
+                </select>
+              </div>
             ) : (
-              <h2 className="text-2xl font-semibold text-white">{outfit.name}</h2>
+              <div>
+                <h2 className="text-2xl font-semibold text-white">{outfit.name}</h2>
+                {outfit.folder && (
+                  <span className="inline-block mt-2 px-3 py-1 bg-white/20 text-white rounded-lg text-xs font-medium backdrop-blur-sm border border-white/10">
+                    {outfit.folder}
+                  </span>
+                )}
+              </div>
             )}
-            <p className="text-white/80 text-sm mt-1">
+            <p className="text-white/80 text-sm mt-3">
               {selectedItems.length} {selectedItems.length === 1 ? 'prenda' : 'prendas'}
             </p>
           </div>
@@ -104,6 +126,7 @@ export const OutfitModal = ({ outfit, onClose, onUpdate }: OutfitModalProps) => 
                   onClick={() => {
                     setIsEditing(false);
                     setOutfitName(outfit.name);
+                    setOutfitFolder(outfit.folder || '');
                     loadClothingItems();
                   }}
                   className="p-2.5 bg-white/20 text-white rounded-full hover:bg-white/30 transition-colors"

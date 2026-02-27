@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Upload, User, X } from 'lucide-react';
 import { UserPhoto } from '../types';
 import { storageService, fileToBase64 } from '../services/storage';
+import { ImageModal } from './ImageModal';
+import { PageHeader } from './PageHeader';
 
 const angles: Array<{ value: UserPhoto['angle']; label: string }> = [
   { value: 'front', label: 'Frente' },
@@ -16,6 +18,7 @@ export const UserPhotosUpload = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [enlargedImage, setEnlargedImage] = useState<{ url: string; alt: string } | null>(null);
 
   useEffect(() => {
     loadPhotos();
@@ -69,16 +72,13 @@ export const UserPhotosUpload = () => {
 
   return (
     <div className="space-y-8">
+      <PageHeader
+        title="Mis Fotos"
+        description="Sube fotos tuyas desde diferentes ángulos para obtener mejores resultados en las pruebas virtuales"
+        icon={User}
+      />
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <User className="w-6 h-6 text-gray-400" />
-          <h3 className="text-xl font-light text-gray-900">Mis Fotos</h3>
-        </div>
-
-        <p className="text-sm text-gray-500 font-light mb-6">
-          Sube fotos tuyas desde diferentes ángulos para obtener mejores resultados en las pruebas virtuales
-        </p>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-light text-gray-700 mb-2">
@@ -158,7 +158,8 @@ export const UserPhotosUpload = () => {
                     <img
                       src={photo.imageUrl}
                       alt={angle.label}
-                      className="w-full aspect-square object-cover rounded-xl bg-gray-50"
+                      className="w-full aspect-square object-cover rounded-xl bg-gray-50 cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => setEnlargedImage({ url: photo.imageUrl, alt: angle.label })}
                     />
                     <button
                       onClick={() => deletePhoto(photo.id)}
@@ -177,6 +178,14 @@ export const UserPhotosUpload = () => {
           })}
         </div>
       </div>
+
+      {enlargedImage && (
+        <ImageModal
+          imageUrl={enlargedImage.url}
+          altText={enlargedImage.alt}
+          onClose={() => setEnlargedImage(null)}
+        />
+      )}
     </div>
   );
 };

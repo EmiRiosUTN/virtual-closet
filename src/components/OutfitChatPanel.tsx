@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { createGeminiChatService } from '../services/geminiChat';
+import { createOpenAIChatService } from '../services/openaiChat';
 import { storageService } from '../services/storage';
 import { useToast } from '../hooks/useToast';
 import type { ChatMessage, SavedTryOn } from '../types';
@@ -114,8 +114,8 @@ export function OutfitChatPanel({
         setLoading(true);
 
         try {
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-            const chatService = createGeminiChatService(apiKey);
+            const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+            const chatService = createOpenAIChatService(apiKey);
 
             const conversationHistory = messages
                 .filter(msg => msg.role === 'user' || msg.role === 'assistant')
@@ -231,10 +231,10 @@ export function OutfitChatPanel({
                                 >
                                     <div
                                         className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.role === 'user'
-                                                ? 'bg-black text-white'
-                                                : message.role === 'system'
-                                                    ? 'bg-red-50 text-red-700 border border-red-200'
-                                                    : 'bg-gradient-to-br from-purple-50 to-pink-50 text-gray-900 border border-purple-100'
+                                            ? 'bg-black text-white'
+                                            : message.role === 'system'
+                                                ? 'bg-red-50 text-red-700 border border-red-200'
+                                                : 'bg-gradient-to-br from-purple-50 to-pink-50 text-gray-900 border border-purple-100'
                                             }`}
                                     >
                                         {message.role === 'assistant' ? (
@@ -248,8 +248,8 @@ export function OutfitChatPanel({
                                         )}
                                         <p
                                             className={`text-xs mt-2 ${message.role === 'user' ? 'text-gray-300'
-                                                    : message.role === 'system' ? 'text-red-400'
-                                                        : 'text-gray-500'
+                                                : message.role === 'system' ? 'text-red-400'
+                                                    : 'text-gray-500'
                                                 }`}
                                         >
                                             {new Date(message.created_at).toLocaleTimeString('es-ES', {
